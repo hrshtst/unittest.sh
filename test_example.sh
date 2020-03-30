@@ -4,6 +4,7 @@
 #
 # A sample test script for unittest.sh.
 
+# shellcheck source=unittest.sh
 source unittest.sh
 
 test_add() {
