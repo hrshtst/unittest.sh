@@ -7,9 +7,8 @@
 # shellcheck source=unittest.sh
 source unittest.sh
 
-test_collect_tests() {
-  this_test ""
-  echo "executing: ${FUNCNAME[0]}"
+testcase_num_collect_tests() {
+  this_test "checks number of collected test cases"
   [ ${#__unittest_tests[@]} -eq 1 ]
 }
 

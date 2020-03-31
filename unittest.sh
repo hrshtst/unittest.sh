@@ -16,27 +16,27 @@
 #
 # source unittest.sh
 #
-# test_add() {
+# testcase_add() {
 #   this_test "adds numbers using bc"
 #   result="$(echo 2+2 | bc)"
 #   [ "$result" -eq 4 ]
 # }
 #
-# test_run() {
+# testcase_run() {
 #   this_test "gets the word 'bar' with cut command"
 #   run echo 'foo bar baz' | cut -d' ' -f2
 #   [ "$status" -eq 0 ]
 #   [ "$output" = "bar" ]
 # }
 #
-# test_skip() {
+# testcase_skip() {
 #   this_test "is skipped"
 #   skip "foo command returns 0 but not now"
 #   run foo
 #   [ "$status" -eq 0 ]
 # }
 #
-# test_fail() {
+# testcase_fail() {
 #   this_test "always fails"
 #   false
 # }
@@ -58,11 +58,11 @@
 # 4 tests, 1 failures, 1 skipped
 # ..
 #
-# Each test case is defined as a function which starts with `test_`.
-# Inside the test case a short description of the test should be put
-# in the first line with a `this_test` helper command. Afterwards,
-# standard shell commands can be written. If every command exits with
-# `0` status, the test passes.
+# Each test case is defined as a function which starts with
+# `testcase_`. Inside the test case a short description of the test
+# should be put in the first line with a `this_test` helper command.
+# Afterwards, standard shell commands can be written. If every command
+# exits with `0` status, the test passes.
 #
 # A hepler command `run` invokes arguments as a bash command, then
 # stores its exit code in a variable `$status`. The `run` command
@@ -105,7 +105,7 @@ skip() {
 __unittest_tests=()
 unittest_collect_tests() {
   local regex_tests
-  regex_tests="^test_.*"
+  regex_tests="^testcase_.*"
 
   while IFS= read -r func; do
     __unittest_tests+=("$func")
