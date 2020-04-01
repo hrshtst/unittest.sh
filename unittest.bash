@@ -204,6 +204,11 @@ __unittest_postprocesses() {
   fi
 }
 
+# define colors of faces for printing results.
+reset=$(tput sgr0)
+red=$(tput setaf 1)
+brightred=$(tput setaf 9)
+
 __unittest_print_result_pass() {
   printf " ✓ %s\n" "$__unittest_description"
 }
@@ -212,14 +217,15 @@ __unittest_print_result_fail() {
   local source lineno
   local failure_location failure_detail
 
-  printf " ✗ %s\n" "$__unittest_description"
+  printf "%s ✗ %s%s\n" "$red" "$__unittest_description" "$reset"
   for i in "${!__unittest_err_status[@]}"; do
     source="${__unittest_err_source[$i]}"
     lineno="${__unittest_err_lineno[$i]}"
     failure_location="$(printf "test file %s, line %d" "$source" "$lineno")"
     failure_detail="$(sed -e "${lineno}q;d" "$source" | sed -e "s/^[[:space:]]*//")"
-    printf "   (in %s)\n     \`%s\' failed with %d\n"\
-           "$failure_location" "$failure_detail" "${__unittest_err_status[$i]}"
+    printf "%s   (in %s)\n     \`%s\' failed with %d%s\n"\
+           "$brightred" "$failure_location" "$failure_detail" \
+           "${__unittest_err_status[$i]}" "$reset"
   done
 }
 
