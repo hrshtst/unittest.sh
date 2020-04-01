@@ -13,6 +13,8 @@ testcase_add() {
   [ "$result" -eq 4 ]
 }
 
+status=0
+output="bar"
 testcase_run() {
   this_test "gets the word 'bar' with cut command"
   run echo 'foo bar baz' | cut -d' ' -f2

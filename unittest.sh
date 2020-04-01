@@ -89,9 +89,66 @@
 # I reimplemented almost the same functionality, but do not their
 # copyrights explicitly. I would like to thank them here.
 
-__unittest_current_description=
+# Contains a filename of the currently executing script.
+__unittest_script_filename="${BASH_SOURCE[1]}"
+
+# Contains the current working directory.
+__unittest_working_directory="$(pwd)"
+
+# Keeps the state whether a test case is failed or not. When it is set
+# to `true`, it means the most recent test case failed. It should be
+# set to false prior to running each test case.
+__unittest_failed=false
+
+# When a test case is skipped, this flag is set to `true`. It should
+# be set to false prior to running each test case.
+__unittest_skipped=false
+
+# Contains a function name which is about to run or currently running
+# as a test case. Its value should start with 'testcase_' so as to be
+# collected automatically by `unittest_collect_testcases`.
+__unittest_testcase=
+
+# Contains a string which describes a test case being about to run or
+# currently running.
+__unittest_description=
+
+# Contains a string of notes why a test case is skipped. It is given
+# as an argument of `skip` command.
+__unittest_skip_note=
+
+# Contains all the collected function names given as test cases. It
+# includes skipped tests.
+__unittest_tests=()
+
+# Contains function names of passed test cases.
+__unittest_passed_tests=()
+
+# Contains function names of failed test cases.
+__unittest_failed_tests=()
+
+# Contains function names of skipped test cases.
+__unittest_skipped_tests=()
+
+# Declared as an associative array which contains function names of
+# test cases as values indexed by descriptions of the test.
+declare -A __unittest_tests_map
+
+set -o errtrace
+
+#
+__unittest_on_failed() {
+  local _status="$?"
+
+  if [[ "${BASH_SOURCE[1]}" = "$__unittest_script_filename" ]]; then
+    __unittest_failed=true
+  fi
+}
+
+trap "__unittest_on_failed" ERR
+
 this_test() {
-  __unittest_current_description="$1"
+  __unittest_description="$1"
 }
 
 run() {
@@ -99,11 +156,51 @@ run() {
 }
 
 skip() {
+  __unittest_skip_note="$1"
+}
+
+unittest_setup() {
   :
 }
 
-__unittest_tests=()
-unittest_collect_tests() {
+__unittest_preprocesses() {
+  __unittest_testcase="$1"
+  __unittest_failed=false
+}
+
+__unittest_postprocesses() {
+  if [[ $__unittest_skipped = true ]]; then
+    __unittest_skipped_tests+=("$__unittest_testcase")
+  elif [[ $__unittest_failed = true ]]; then
+    __unittest_failed_tests+=("$__unittest_testcase")
+  else
+    __unittest_passed_tests+=("$__unittest_testcase")
+  fi
+}
+
+__unittest_print_result_pass() {
+  printf " ✓ %s\n" "$__unittest_description"
+}
+
+__unittest_print_result_fail() {
+  printf " ✗ %s\n" "$__unittest_description"
+}
+
+__unittest_print_result_skip() {
+  printf " - %s\n" "$__unittest_description"
+}
+
+__unittest_print_result() {
+  if [[ $__unittest_skipped = true ]]; then
+    __unittest_print_result_skip
+  elif [[ $__unittest_failed = true ]]; then
+    __unittest_print_result_fail
+  else
+    __unittest_print_result_pass
+  fi
+}
+
+unittest_collect_testcases() {
   local regex_tests
   regex_tests="^testcase_.*"
 
@@ -112,15 +209,53 @@ unittest_collect_tests() {
   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_tests")
 }
 
-unittest_run_tests() {
+unittest_run_testcases() {
   local testcase
 
   for testcase in "${__unittest_tests[@]}"; do
-    $testcase
+    __unittest_preprocesses "$testcase"
+    $__unittest_testcase
+    __unittest_postprocesses
+    __unittest_print_result
   done
 }
 
+__make_word_plural() {
+  local word n
+  word="$1"
+  n="$2"
+
+  if (( n == 1 )); then
+    echo "$word"
+  else
+    echo "${word}s"
+  fi
+}
+
+unittest_print_summary() {
+  local n_tests n_failed n_skipped
+  local summary
+
+  # store numbers of executed tests in variables
+  n_tests=${#__unittest_tests[@]}
+  n_failed=${#__unittest_failed_tests[@]}
+  n_skipped=${#__unittest_skipped_tests[@]}
+
+  # make summary text
+  summary=""
+  summary+="$(printf "%d %s" $n_tests "$(__make_word_plural test $n_tests)")"
+  summary+="$(printf ", %d %s" $n_failed "$(__make_word_plural failure $n_failed)")"
+  if (( n_skipped > 0 )); then
+    summary+="$(printf ", %d skipped" $n_skipped)"
+  fi
+
+  # output
+  printf "\n%s\n" "$summary"
+}
+
 unittest_run() {
-  unittest_collect_tests
-  unittest_run_tests
+  unittest_setup
+  unittest_collect_testcases
+  unittest_run_testcases
+  unittest_print_summary
 }
