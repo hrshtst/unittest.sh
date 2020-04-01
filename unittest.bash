@@ -134,18 +134,27 @@ __unittest_skipped_tests=()
 # test cases as values indexed by descriptions of the test.
 declare -A __unittest_tests_map
 
+# An array which contains source filenames corresponding to functions
+# being executed when ERR signal is trapped. This variable is cleared
+# prior to running each test case.
+__unittest_err_source=()
+
+# An array which contains line numbers in source files corresponding
+# to functions being executed when ERR signal is trapped. This
+# variable is cleared prior to running each test case.
+__unittest_err_lineno=()
+
+# An array which contains statuses returned from functions when ERR
+# signal is trapped. This variable is cleared prior to running each
+# test case.
+__unittest_err_status=()
+
+# Set an option so that any trap on ERR signal is caught to turn
+# `__unittest_failed` flag on. This is the same as `set -E`. Note that
+# `set -o errexit` or `set -e` can not be used here since that option
+# exits immediately when ERR is sent.
 set -o errtrace
-
-#
-__unittest_on_failed() {
-  local _status="$?"
-
-  if [[ "${BASH_SOURCE[1]}" = "$__unittest_script_filename" ]]; then
-    __unittest_failed=true
-  fi
-}
-
-trap "__unittest_on_failed" ERR
+trap __unittest_on_failed ERR
 
 this_test() {
   __unittest_description="$1"
@@ -163,9 +172,26 @@ unittest_setup() {
   :
 }
 
+#
+__unittest_on_failed() {
+  # Keep the exit status returned by the last function or command.
+  local _status="$?"
+
+  # Check if ERR signal is sent from the test script.
+  if [[ "${BASH_SOURCE[1]}" = "$__unittest_script_filename" ]]; then
+    __unittest_failed=true
+    __unittest_err_source+=("${BASH_SOURCE[1]}")
+    __unittest_err_lineno+=("${BASH_LINENO[0]}")
+    __unittest_err_status+=("$_status")
+  fi
+}
+
 __unittest_preprocesses() {
   __unittest_testcase="$1"
   __unittest_failed=false
+  __unittest_err_source=()
+  __unittest_err_lineno=()
+  __unittest_err_status=()
 }
 
 __unittest_postprocesses() {
@@ -183,7 +209,18 @@ __unittest_print_result_pass() {
 }
 
 __unittest_print_result_fail() {
+  local source lineno
+  local failure_location failure_detail
+
   printf " ✗ %s\n" "$__unittest_description"
+  for i in "${!__unittest_err_status[@]}"; do
+    source="${__unittest_err_source[$i]}"
+    lineno="${__unittest_err_lineno[$i]}"
+    failure_location="$(printf "test file %s, line %d" "$source" "$lineno")"
+    failure_detail="$(sed -e "${lineno}q;d" "$source" | sed -e "s/^[[:space:]]*//")"
+    printf "   (in %s)\n     \`%s\' failed with %d\n"\
+           "$failure_location" "$failure_detail" "${__unittest_err_status[$i]}"
+  done
 }
 
 __unittest_print_result_skip() {
