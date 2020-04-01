@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# test_unittest.sh
+# test_unittest.bash
 #
-# Unit testing for unittest.sh
+# Unit testing for unittest.bash
 
-# shellcheck source=unittest.sh
-source unittest.sh
+# shellcheck source=unittest.bash
+source unittest.bash
 
 testcase_num_collect_tests() {
   this_test "checks number of collected test cases"

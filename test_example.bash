@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# test_exmple.sh
+# test_exmple.bash
 #
-# A sample test script for unittest.sh.
+# A sample test script for unittest.bash.
 
-# shellcheck source=unittest.sh
-source unittest.sh
+# shellcheck source=unittest.bash
+source unittest.bash
 
 testcase_add() {
   this_test "adds numbers using bc"

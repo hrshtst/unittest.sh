@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# unittest.sh
+# unittest.bash
 #
 # This script provides a micro unit testing framework for bash shell
 # scripts. Each test case consists of a short description and shell
@@ -14,7 +14,7 @@
 # --
 # #!/bin/bash
 #
-# source unittest.sh
+# source unittest.bash
 #
 # testcase_add() {
 #   this_test "adds numbers using bc"
@@ -44,16 +44,16 @@
 # unittest_run "$@"
 # ..
 #
-# Let's say this is saved as `test_example.sh`. Execute the script as
+# Let's say this is saved as `test_example.bash`. Execute the script as
 # a standard bash script, then output looks like this.
 #
 # --
-# $ ./test_example.sh
+# $ ./test_example.bash
 # ✓ adds numbers using bc
 # ✓ gets the word 'bar' with cut command
 # - is skipped (skip: foo command returns 0 but not now)
 # ✗ always fails
-# (in test file test_example.sh, line 27)
+# (in test file test_example.bash, line 27)
 #
 # 4 tests, 1 failures, 1 skipped
 # ..
