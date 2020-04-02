@@ -109,6 +109,11 @@ __unittest_skipped=false
 # collected automatically by `unittest_collect_testcases`.
 __unittest_testcase=
 
+# Contains a content of the function `$__unittest_testcase`. If the
+# `skip` command exists inside it, a statement `return 0;` is added to
+# just below the `skip` command while pre-process.
+__unittest_testcase_definition=
+
 # Contains a string which describes a test case being about to run or
 # currently running.
 __unittest_description=
@@ -157,7 +162,7 @@ set -o errtrace
 trap __unittest_on_failed ERR
 
 this_test() {
-  __unittest_description="$1"
+  __unittest_description="${1:-anonymous test}"
 }
 
 run() {
@@ -165,7 +170,8 @@ run() {
 }
 
 skip() {
-  __unittest_skip_note="$1"
+  __unittest_skip_note="${1:-}"
+  __unittest_skipped=true
 }
 
 unittest_setup() {
@@ -188,10 +194,25 @@ __unittest_on_failed() {
 
 __unittest_preprocesses() {
   __unittest_testcase="$1"
+
+  local definition
+  definition="$(declare -f "$__unittest_testcase")"
+
+  # initialize variables
+  __unittest_description=
   __unittest_failed=false
+  __unittest_skipped=false
   __unittest_err_source=()
   __unittest_err_lineno=()
   __unittest_err_status=()
+
+  # pre-process for a skipped test
+  if echo "$definition" | grep -q "^[[:space:]]\+skip"; then
+    local cmd
+    cmd="s/^\([[:space:]]\+\)skip\(.*\);/\1skip\2;\n\1return 0;/"
+    __unittest_testcase_definition="$(echo "$definition" | sed -e "$cmd")"
+    eval "$__unittest_testcase_definition"
+  fi
 }
 
 __unittest_postprocesses() {
@@ -230,7 +251,9 @@ __unittest_print_result_fail() {
 }
 
 __unittest_print_result_skip() {
-  printf " - %s\n" "$__unittest_description"
+  local skip_note
+  skip_note="${__unittest_skip_note:+: }${__unittest_skip_note}"
+  printf " - %s (skipped%s)\n" "$__unittest_description" "$skip_note"
 }
 
 __unittest_print_result() {
