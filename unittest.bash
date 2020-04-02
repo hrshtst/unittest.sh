@@ -170,6 +170,24 @@ __unittest_err_lineno=()
 __unittest_err_status=()
 
 
+### Global variables used in test scripts.
+
+# Contains an exit status when running a bash command with the `run`
+# command.
+export status
+status=
+
+# Contains a string combined the standard output and the standard
+# error of a bash command executed with the `run` command.
+export output
+output=
+
+# An array whose elements are separated lines of the content of the
+# `$output` variable.
+export lines
+lines=()
+
+
 ### Setting the `errtrace` option to catch ERR signal
 
 # Set an option so that any trap on ERR signal is caught to turn
