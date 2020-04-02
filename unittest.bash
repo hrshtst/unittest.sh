@@ -93,70 +93,84 @@
 # I reimplemented almost the same functionality, but do not express
 # their copyrights explicitly. I would like to thank them here.
 
-# Contains a filename of the currently executing script.
+
+### Global variables used throughout running the all test cases.
+
+# Contains a filename of the test script.
 __unittest_script_filename="${BASH_SOURCE[1]}"
 
-# Contains the current working directory.
+# Contains the working directory to run test cases. Its default value
+# is the current working directory, but it may be modified with
+# command arguments.
 __unittest_working_directory="$(pwd)"
 
-# Keeps the state whether a test case is failed or not. When it is set
-# to `true`, it means the most recent test case failed. It should be
-# set to false prior to running each test case.
-__unittest_failed=false
 
-# When a test case is skipped, this flag is set to `true`. It should
-# be set to false prior to running each test case.
-__unittest_skipped=false
+### Global variables which store executed tests and their results.
 
-# Contains a function name which is about to run or currently running
-# as a test case. Its value should start with 'testcase_' so as to be
+# An array which contains all the function names defined in the test
+# script. It is built by the `unittest_collect_testcases` function.
+__unittest_all_tests=()
+
+# An associative array which contains test case functions as values
+# indexed by descriptions of the test. It is built by the
+# `unittest_collect_testcases` function
+declare -A __unittest_tests_map
+
+# An array which contains function names actually executed.
+__unittest_executed_tests=()
+
+# An array which contains function names of passed test cases.
+__unittest_passed_tests=()
+
+# An array which contains function names of failed test cases.
+__unittest_failed_tests=()
+
+# An array which contains function names of skipped test cases.
+__unittest_skipped_tests=()
+
+
+### Global variables cleared or initialized prior to running each test
+### case.
+
+# Contains a function which is about to run (or currently running) as
+# a test case. Its value should start with 'testcase_' so as to be
 # collected automatically by `unittest_collect_testcases`.
 __unittest_testcase=
 
-# Contains a content of the function `$__unittest_testcase`. If the
-# `skip` command exists inside it, a statement `return 0;` is added to
-# just below the `skip` command while pre-process.
+# Contains the definition of the function `$__unittest_testcase`. If
+# the `skip` command exists inside it, a statement `return 0;` is
+# added to just below the `skip` command while running pre-process.
 __unittest_testcase_definition=
 
-# Contains a string which describes a test case being about to run or
-# currently running.
+# Contains a string which describes the current test case. It is given
+# by the `this_test` command.
 __unittest_description=
 
-# Contains a string of notes why a test case is skipped. It is given
-# as an argument of `skip` command.
+# Contains notes why a test case is skipped. It is given as an
+# optional argument of the `skip` command.
 __unittest_skip_note=
 
-# Contains all the collected function names given as test cases. It
-# includes skipped tests.
-__unittest_tests=()
+# Keeps the state whether a test case is failed or not. When it is set
+# to `true`, it means the most recent test case failed.
+__unittest_failed=false
 
-# Contains function names of passed test cases.
-__unittest_passed_tests=()
-
-# Contains function names of failed test cases.
-__unittest_failed_tests=()
-
-# Contains function names of skipped test cases.
-__unittest_skipped_tests=()
-
-# Declared as an associative array which contains function names of
-# test cases as values indexed by descriptions of the test.
-declare -A __unittest_tests_map
+# When a test case is skipped, this flag is set to `true`.
+__unittest_skipped=false
 
 # An array which contains source filenames corresponding to functions
-# being executed when ERR signal is trapped. This variable is cleared
-# prior to running each test case.
+# being executed when ERR signal is trapped.
 __unittest_err_source=()
 
 # An array which contains line numbers in source files corresponding
-# to functions being executed when ERR signal is trapped. This
-# variable is cleared prior to running each test case.
+# to functions being executed when ERR signal is trapped.
 __unittest_err_lineno=()
 
 # An array which contains statuses returned from functions when ERR
-# signal is trapped. This variable is cleared prior to running each
-# test case.
+# signal is trapped.
 __unittest_err_status=()
+
+
+### Setting the `errtrace` option to catch ERR signal
 
 # Set an option so that any trap on ERR signal is caught to turn
 # `__unittest_failed` flag on. This is the same as `set -E`. Note that
@@ -275,14 +289,14 @@ unittest_collect_testcases() {
   regex_tests="^testcase_.*"
 
   while IFS= read -r func; do
-    __unittest_tests+=("$func")
+    __unittest_all_tests+=("$func")
   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_tests")
 }
 
 unittest_run_testcases() {
   local testcase
 
-  for testcase in "${__unittest_tests[@]}"; do
+  for testcase in "${__unittest_all_tests[@]}"; do
     __unittest_preprocesses "$testcase"
     $__unittest_testcase
     __unittest_postprocesses
@@ -307,7 +321,7 @@ unittest_print_summary() {
   local summary
 
   # store numbers of executed tests in variables
-  n_tests=${#__unittest_tests[@]}
+  n_tests=${#__unittest_all_tests[@]}
   n_failed=${#__unittest_failed_tests[@]}
   n_skipped=${#__unittest_skipped_tests[@]}
 
