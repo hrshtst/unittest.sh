@@ -3,16 +3,17 @@
 # unittest.bash
 #
 # This script provides a micro unit testing framework for bash shell
-# scripts. Each test case consists of a short description and shell
-# commands. Test cases are identified by the description each other.
-# This framework does not provide any assertion command. Instead, it
-# harnesses `errexit` option. If every command in the test case exits
-# with a `0` status code, the test passes.
+# scripts. Each test case consists of a short description of it and
+# shell commands to be tested. Note that this framework does not
+# provide any assertion command. Instead, it harnesses a trap on `ERR`
+# signal, which enabled with the `errtrace` option by the `set`
+# command provided by bash. If every command in a test case exits with
+# the `0` status code, it means that the test passes.
 #
 # The following code is an example usage of this framework.
 #
 # --
-# #!/bin/bash
+# #!/usr/bin/env bash
 #
 # source unittest.bash
 #
@@ -44,33 +45,36 @@
 # unittest_run "$@"
 # ..
 #
-# Let's say this is saved as `test_example.bash`. Execute the script as
-# a standard bash script, then output looks like this.
+# Let's say the example script is saved as `test_example.bash`.
+# Execute the script as a standard bash script, then the output on the
+# terminal looks like this.
 #
 # --
 # $ ./test_example.bash
-# ✓ adds numbers using bc
-# ✓ gets the word 'bar' with cut command
-# - is skipped (skip: foo command returns 0 but not now)
-# ✗ always fails
-# (in test file test_example.bash, line 27)
+#  ✓ adds numbers using bc
+#  ✗ always fails
+#    (in test file ./test_example.bash, line 27)
+#      `false' failed with 1
+#  ✓ gets the word 'bar' with cut command
+#  - is skipped (skipped: foo command return 0 but not now)
 #
-# 4 tests, 1 failures, 1 skipped
+# 4 tests, 1 failure, 1 skipped
 # ..
 #
-# Each test case is defined as a function which starts with
-# `testcase_`. Inside the test case a short description of the test
-# should be put in the first line with a `this_test` helper command.
-# Afterwards, standard shell commands can be written. If every command
-# exits with `0` status, the test passes.
+# The order to execute test cases is sorted alphabetically. Each test
+# case is defined as a function whose name starts with `testcase_`.
+# Inside the test case a short description of the test should be put
+# in the first line with the `this_test` helper command. Afterwards,
+# standard shell commands can be written. If every command exits with
+# the `0` status, the test passes.
 #
-# A hepler command `run` invokes arguments as a bash command, then
-# stores its exit code in a variable `$status`. The `run` command
+# The hepler command `run` invokes arguments as a bash command, then
+# stores its exit status in a variable `$status`. The `run` command
 # itself exits with `0` status code so that you can continue following
 # asssertions. Also, the `$output` variable contains the contents of
 # the standard output and the standard errors.
 #
-# To skip some test temporarily, you can use a `skip` command. The
+# To skip some test temporarily, you can use the `skip` command. The
 # `skip` command accepts the reason for skipping as an optional
 # argument.
 #
@@ -81,13 +85,13 @@
 # arguments to run all test cases and show results.
 #
 # Output format of the result and ideas of `run` and `skip` commands
-# and `$status` and `$output` variables are adopted from the Bash
-# Automated Testing System (a.k.a BATS), which is hosted on
+# and `$status` and `$output` variables and so on are adopted from the
+# Bash Automated Testing System (a.k.a BATS), which is hosted on
 # [https://github.com/sstephenson/bats] by Sam Stephenson and
 # currently-maintained version on
 # [https://github.com/bats-core/bats-core] by bats-core contributors.
-# I reimplemented almost the same functionality, but do not their
-# copyrights explicitly. I would like to thank them here.
+# I reimplemented almost the same functionality, but do not express
+# their copyrights explicitly. I would like to thank them here.
 
 # Contains a filename of the currently executing script.
 __unittest_script_filename="${BASH_SOURCE[1]}"
