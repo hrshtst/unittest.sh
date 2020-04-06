@@ -197,6 +197,9 @@ lines=()
 set -o errtrace
 trap __unittest_on_failed ERR
 
+
+### Helper commands
+
 this_test() {
   __unittest_description="${1:-anonymous test}"
 }
@@ -210,11 +213,9 @@ skip() {
   __unittest_skipped=true
 }
 
-unittest_setup() {
-  :
-}
 
-#
+### Internal helper functions
+
 __unittest_on_failed() {
   # Keep the exit status returned by the last function or command.
   local _status="$?"
@@ -302,6 +303,25 @@ __unittest_print_result() {
   fi
 }
 
+__make_word_plural() {
+  local word n
+  word="$1"
+  n="$2"
+
+  if (( n == 1 )); then
+    echo "$word"
+  else
+    echo "${word}s"
+  fi
+}
+
+
+### Core functions
+
+unittest_setup() {
+  :
+}
+
 unittest_collect_testcases() {
   local regex_tests
   regex_tests="^testcase_.*"
@@ -320,18 +340,6 @@ unittest_run_testcases() {
     __unittest_postprocesses
     __unittest_print_result
   done
-}
-
-__make_word_plural() {
-  local word n
-  word="$1"
-  n="$2"
-
-  if (( n == 1 )); then
-    echo "$word"
-  else
-    echo "${word}s"
-  fi
 }
 
 unittest_print_summary() {
