@@ -5,7 +5,7 @@
 # A sample test script for unittest.sh.
 
 # shellcheck source=unittest.sh
-source unittest.sh
+source ../unittest.sh
 
 testcase_add() {
   this_test "adds numbers using bc"
