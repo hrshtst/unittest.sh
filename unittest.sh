@@ -94,6 +94,19 @@
 # their copyrights explicitly. I would like to thank them here.
 
 
+### Setting shell options.
+
+# Treat unset variables and parameters as an error.
+set -u
+
+# Set an option so that any trap on ERR signal is caught to turn
+# `__unittest_failed` flag on. This is the same as `set -E`. Note that
+# `set -o errexit` or `set -e` can not be used here since that option
+# exits immediately when ERR is sent.
+set -o errtrace
+trap __unittest_errtrap ERR
+
+
 ### Global variables used throughout running the all test cases.
 
 # Contains a filename of the test script.
@@ -188,16 +201,6 @@ export lines
 lines=()
 
 
-### Setting the `errtrace` option to catch ERR signal
-
-# Set an option so that any trap on ERR signal is caught to turn
-# `__unittest_failed` flag on. This is the same as `set -E`. Note that
-# `set -o errexit` or `set -e` can not be used here since that option
-# exits immediately when ERR is sent.
-set -o errtrace
-trap __unittest_on_failed ERR
-
-
 ### Helper commands
 
 this_test() {
@@ -216,7 +219,7 @@ skip() {
 
 ### Internal helper functions
 
-__unittest_on_failed() {
+__unittest_errtrap() {
   # Keep the exit status returned by the last function or command.
   local _status="$?"
 
