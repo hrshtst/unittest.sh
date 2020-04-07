@@ -100,46 +100,46 @@
 set -u
 
 # Set an option so that any trap on ERR signal is caught to turn
-# `__unittest_failed` flag on. This is the same as `set -E`. Note that
+# `_unittest_failed` flag on. This is the same as `set -E`. Note that
 # `set -o errexit` or `set -e` can not be used here since that option
 # exits immediately when ERR is sent.
 set -o errtrace
-trap __unittest_errtrap ERR
+trap _unittest_errtrap ERR
 
 
 ### Global variables used throughout running the all test cases.
 
 # Contains a filename of the test script.
-__unittest_script_filename="${BASH_SOURCE[1]}"
+_unittest_script_filename="${BASH_SOURCE[1]}"
 
 # Contains the working directory to run test cases. Its default value
 # is the current working directory, but it may be modified with
 # command arguments.
-__unittest_working_directory="$(pwd)"
+_unittest_working_directory="$(pwd)"
 
 
 ### Global variables which store executed tests and their results.
 
 # An array which contains all the function names defined in the test
 # script. It is built by the `unittest_collect_testcases` function.
-__unittest_all_tests=()
+_unittest_all_tests=()
 
 # An associative array which contains test case functions as values
 # indexed by descriptions of the test. It is built by the
 # `unittest_collect_testcases` function
-declare -A __unittest_tests_map
+declare -A _unittest_tests_map
 
 # An array which contains function names actually executed.
-__unittest_executed_tests=()
+_unittest_executed_tests=()
 
 # An array which contains function names of passed test cases.
-__unittest_passed_tests=()
+_unittest_passed_tests=()
 
 # An array which contains function names of failed test cases.
-__unittest_failed_tests=()
+_unittest_failed_tests=()
 
 # An array which contains function names of skipped test cases.
-__unittest_skipped_tests=()
+_unittest_skipped_tests=()
 
 
 ### Global variables cleared or initialized prior to running each test
@@ -148,39 +148,39 @@ __unittest_skipped_tests=()
 # Contains a function which is about to run (or currently running) as
 # a test case. Its value should start with 'testcase_' so as to be
 # collected automatically by `unittest_collect_testcases`.
-__unittest_testcase=
+_unittest_testcase=
 
-# Contains the definition of the function `$__unittest_testcase`. If
+# Contains the definition of the function `$_unittest_testcase`. If
 # the `skip` command exists inside it, a statement `return 0;` is
 # added to just below the `skip` command while running pre-process.
-__unittest_testcase_definition=
+_unittest_testcase_definition=
 
 # Contains a string which describes the current test case. It is given
 # by the `this_test` command.
-__unittest_description=
+_unittest_description=
 
 # Contains notes why a test case is skipped. It is given as an
 # optional argument of the `skip` command.
-__unittest_skip_note=
+_unittest_skip_note=
 
 # Keeps the state whether a test case is failed or not. When it is set
 # to `true`, it means the most recent test case failed.
-__unittest_failed=false
+_unittest_failed=false
 
 # When a test case is skipped, this flag is set to `true`.
-__unittest_skipped=false
+_unittest_skipped=false
 
 # An array which contains source filenames corresponding to functions
 # being executed when ERR signal is trapped.
-__unittest_err_source=()
+_unittest_err_source=()
 
 # An array which contains line numbers in source files corresponding
 # to functions being executed when ERR signal is trapped.
-__unittest_err_lineno=()
+_unittest_err_lineno=()
 
 # An array which contains statuses returned from functions when ERR
 # signal is trapped.
-__unittest_err_status=()
+_unittest_err_status=()
 
 
 ### Global variables used in test scripts.
@@ -204,7 +204,7 @@ lines=()
 ### Helper commands
 
 this_test() {
-  __unittest_description="${1:-anonymous test}"
+  _unittest_description="${1:-anonymous test}"
 }
 
 run() {
@@ -212,56 +212,56 @@ run() {
 }
 
 skip() {
-  __unittest_skip_note="${1:-}"
-  __unittest_skipped=true
+  _unittest_skip_note="${1:-}"
+  _unittest_skipped=true
 }
 
 
 ### Internal helper functions
 
-__unittest_errtrap() {
+_unittest_errtrap() {
   # Keep the exit status returned by the last function or command.
   local _status="$?"
 
   # Check if ERR signal is sent from the test script.
-  if [[ "${BASH_SOURCE[1]}" = "$__unittest_script_filename" ]]; then
-    __unittest_failed=true
-    __unittest_err_source+=("${BASH_SOURCE[1]}")
-    __unittest_err_lineno+=("${BASH_LINENO[0]}")
-    __unittest_err_status+=("$_status")
+  if [[ "${BASH_SOURCE[1]}" = "$_unittest_script_filename" ]]; then
+    _unittest_failed=true
+    _unittest_err_source+=("${BASH_SOURCE[1]}")
+    _unittest_err_lineno+=("${BASH_LINENO[0]}")
+    _unittest_err_status+=("$_status")
   fi
 }
 
-__unittest_preprocesses() {
-  __unittest_testcase="$1"
+_unittest_preprocesses() {
+  _unittest_testcase="$1"
 
   local definition
-  definition="$(declare -f "$__unittest_testcase")"
+  definition="$(declare -f "$_unittest_testcase")"
 
   # initialize variables
-  __unittest_description=
-  __unittest_failed=false
-  __unittest_skipped=false
-  __unittest_err_source=()
-  __unittest_err_lineno=()
-  __unittest_err_status=()
+  _unittest_description=
+  _unittest_failed=false
+  _unittest_skipped=false
+  _unittest_err_source=()
+  _unittest_err_lineno=()
+  _unittest_err_status=()
 
   # pre-process for a skipped test
   if echo "$definition" | grep -q "^[[:space:]]\+skip"; then
     local cmd
     cmd="s/^\([[:space:]]\+\)skip\(.*\);/\1skip\2;\n\1return 0;/"
-    __unittest_testcase_definition="$(echo "$definition" | sed -e "$cmd")"
-    eval "$__unittest_testcase_definition"
+    _unittest_testcase_definition="$(echo "$definition" | sed -e "$cmd")"
+    eval "$_unittest_testcase_definition"
   fi
 }
 
-__unittest_postprocesses() {
-  if [[ $__unittest_skipped = true ]]; then
-    __unittest_skipped_tests+=("$__unittest_testcase")
-  elif [[ $__unittest_failed = true ]]; then
-    __unittest_failed_tests+=("$__unittest_testcase")
+_unittest_postprocesses() {
+  if [[ $_unittest_skipped = true ]]; then
+    _unittest_skipped_tests+=("$_unittest_testcase")
+  elif [[ $_unittest_failed = true ]]; then
+    _unittest_failed_tests+=("$_unittest_testcase")
   else
-    __unittest_passed_tests+=("$__unittest_testcase")
+    _unittest_passed_tests+=("$_unittest_testcase")
   fi
 }
 
@@ -270,39 +270,39 @@ reset=$(tput sgr0)
 red=$(tput setaf 1)
 brightred=$(tput setaf 9)
 
-__unittest_print_result_pass() {
-  printf " ✓ %s\n" "$__unittest_description"
+_unittest_print_result_pass() {
+  printf " ✓ %s\n" "$_unittest_description"
 }
 
-__unittest_print_result_fail() {
+_unittest_print_result_fail() {
   local source lineno
   local failure_location failure_detail
 
-  printf "%s ✗ %s%s\n" "$red" "$__unittest_description" "$reset"
-  for i in "${!__unittest_err_status[@]}"; do
-    source="${__unittest_err_source[$i]}"
-    lineno="${__unittest_err_lineno[$i]}"
+  printf "%s ✗ %s%s\n" "$red" "$_unittest_description" "$reset"
+  for i in "${!_unittest_err_status[@]}"; do
+    source="${_unittest_err_source[$i]}"
+    lineno="${_unittest_err_lineno[$i]}"
     failure_location="$(printf "test file %s, line %d" "$source" "$lineno")"
     failure_detail="$(sed -e "${lineno}q;d" "$source" | sed -e "s/^[[:space:]]*//")"
     printf "%s   (in %s)\n     \`%s\' failed with %d%s\n"\
            "$brightred" "$failure_location" "$failure_detail" \
-           "${__unittest_err_status[$i]}" "$reset"
+           "${_unittest_err_status[$i]}" "$reset"
   done
 }
 
-__unittest_print_result_skip() {
+_unittest_print_result_skip() {
   local skip_note
-  skip_note="${__unittest_skip_note:+: }${__unittest_skip_note}"
-  printf " - %s (skipped%s)\n" "$__unittest_description" "$skip_note"
+  skip_note="${_unittest_skip_note:+: }${_unittest_skip_note}"
+  printf " - %s (skipped%s)\n" "$_unittest_description" "$skip_note"
 }
 
-__unittest_print_result() {
-  if [[ $__unittest_skipped = true ]]; then
-    __unittest_print_result_skip
-  elif [[ $__unittest_failed = true ]]; then
-    __unittest_print_result_fail
+_unittest_print_result() {
+  if [[ $_unittest_skipped = true ]]; then
+    _unittest_print_result_skip
+  elif [[ $_unittest_failed = true ]]; then
+    _unittest_print_result_fail
   else
-    __unittest_print_result_pass
+    _unittest_print_result_pass
   fi
 }
 
@@ -330,18 +330,18 @@ unittest_collect_testcases() {
   regex_tests="^testcase_.*"
 
   while IFS= read -r func; do
-    __unittest_all_tests+=("$func")
+    _unittest_all_tests+=("$func")
   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_tests")
 }
 
 unittest_run_testcases() {
   local testcase
 
-  for testcase in "${__unittest_all_tests[@]}"; do
-    __unittest_preprocesses "$testcase"
-    $__unittest_testcase
-    __unittest_postprocesses
-    __unittest_print_result
+  for testcase in "${_unittest_all_tests[@]}"; do
+    _unittest_preprocesses "$testcase"
+    $_unittest_testcase
+    _unittest_postprocesses
+    _unittest_print_result
   done
 }
 
@@ -350,9 +350,9 @@ unittest_print_summary() {
   local summary
 
   # store numbers of executed tests in variables
-  n_tests=${#__unittest_all_tests[@]}
-  n_failed=${#__unittest_failed_tests[@]}
-  n_skipped=${#__unittest_skipped_tests[@]}
+  n_tests=${#_unittest_all_tests[@]}
+  n_failed=${#_unittest_failed_tests[@]}
+  n_skipped=${#_unittest_skipped_tests[@]}
 
   # make summary text
   summary=""

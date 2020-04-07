@@ -9,7 +9,7 @@ source unittest.sh
 
 testcase_num_collect_tests() {
   this_test "checks number of collected test cases"
-  [ ${#__unittest_tests[@]} -eq 2 ]
+  [ ${#_unittest_all_tests[@]} -eq 2 ]
 }
 
 testcase_make_word_plural() {
