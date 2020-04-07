@@ -201,22 +201,6 @@ export lines
 lines=()
 
 
-### Helper commands
-
-this_test() {
-  _unittest_description="${1:-anonymous test}"
-}
-
-run() {
-  :
-}
-
-skip() {
-  _unittest_skip_note="${1:-}"
-  _unittest_skipped=true
-}
-
-
 ### Internal helper functions
 
 _unittest_errtrap() {
@@ -364,6 +348,22 @@ unittest_print_summary() {
 
   # output
   printf "\n%s\n" "$summary"
+}
+
+
+### Helper commands
+
+this_test() {
+  _unittest_description="${1:-anonymous test}"
+}
+
+run() {
+  :
+}
+
+skip() {
+  _unittest_skip_note="${1:-}"
+  _unittest_skipped=true
 }
 
 unittest_run() {
