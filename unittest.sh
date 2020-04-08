@@ -323,7 +323,9 @@ unittest_run_testcases() {
 
   for testcase in "${_unittest_all_tests[@]}"; do
     _unittest_preprocesses "$testcase"
+    setup
     $_unittest_testcase
+    teardown
     _unittest_postprocesses
     _unittest_print_result
   done
@@ -352,6 +354,14 @@ unittest_print_summary() {
 
 
 ### Helper commands
+
+setup() {
+  :
+}
+
+teardown() {
+  :
+}
 
 this_test() {
   _unittest_description="${1:-anonymous test}"
