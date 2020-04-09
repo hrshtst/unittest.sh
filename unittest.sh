@@ -203,6 +203,16 @@ lines=()
 
 ### Internal helper functions
 
+_unittest_initialize() {
+  _unittest_all_tests=()
+  # unset _unittest_tests_map
+  # declare -A _unittest_tests_map
+  _unittest_executed_tests=()
+  _unittest_passed_tests=()
+  _unittest_failed_tests=()
+  _unittest_skipped_tests=()
+}
+
 _unittest_errtrap() {
   # Keep the exit status returned by the last function or command.
   local _status="$?"
@@ -306,7 +316,7 @@ __make_word_plural() {
 ### Core functions
 
 unittest_setup() {
-  :
+  _unittest_initialize
 }
 
 unittest_collect_testcases() {
