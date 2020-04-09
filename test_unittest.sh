@@ -18,7 +18,7 @@ copy_array() {
 }
 
 testcase_copy_array_list() {
-  this_test "should copy elements of a list array to another variable"
+  it "should copy elements of a list array to another variable"
 
   list1=("value1" "value2" "value3")
   copy_array list1 list2
@@ -29,7 +29,7 @@ testcase_copy_array_list() {
 }
 
 testcase_copy_array_dict() {
-  this_test "should copy elements of an associative array to another variable"
+  it "should copy elements of an associative array to another variable"
 
   declare -A dict1=(["key1"]="value1" ["key2"]="value2" ["key3"]="value3")
   copy_array dict1 dict2
@@ -58,13 +58,13 @@ teardown() {
 }
 
 testcase_num_collect_tests() {
-  this_test "should check number of collected test cases"
+  it "should check number of collected test cases"
 
   [ ${#_unittest_all_tests[@]} -eq 5 ]
 }
 
 testcase_initialize() {
-  this_test "should initialize variables used throughout running tests"
+  it "should initialize variables used throughout running tests"
 
   # assign fake values
   _unittest_all_tests=("testcase_dummy")
@@ -85,7 +85,7 @@ testcase_initialize() {
 }
 
 testcase_make_word_plural() {
-  this_test "makes a word plural correctly"
+  it "makes a word plural correctly"
 
   [ "$(__make_word_plural "test" 0)" = "tests" ]
   [ "$(__make_word_plural "test" 1)" = "test" ]

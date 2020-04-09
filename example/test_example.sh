@@ -8,7 +8,7 @@
 source ../unittest.sh
 
 testcase_add() {
-  this_test "adds numbers using bc"
+  it "adds numbers using bc"
   result="$(echo 2+2 | bc)"
   [ "$result" -eq 4 ]
 }
@@ -16,7 +16,7 @@ testcase_add() {
 status=0
 output="bar"
 testcase_run() {
-  this_test "gets the word 'bar' with cut command"
+  it "gets the word 'bar' with cut command"
   run echo 'foo bar baz' | cut -d' ' -f2
   [ "$status" -eq 0 ]
   [ "$output" = "bar" ]
@@ -27,14 +27,14 @@ foo() {
 }
 
 testcase_skip() {
-  this_test "is skipped"
+  it "is skipped"
   skip "foo command return 0 but not now"
   run foo
   [ "$status" -eq 0 ]
 }
 
 testcase_fail() {
-  this_test "always fails"
+  it "always fails"
   false
 }
 

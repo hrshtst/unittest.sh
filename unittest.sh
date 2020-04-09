@@ -18,35 +18,35 @@
 # source unittest.sh
 #
 # testcase_add() {
-#   this_test "adds numbers using bc"
+#   it "adds numbers using bc"
 #   result="$(echo 2+2 | bc)"
 #   [ "$result" -eq 4 ]
 # }
 #
 # testcase_run() {
-#   this_test "gets the word 'bar' with cut command"
+#   it "gets the word 'bar' with cut command"
 #   run echo 'foo bar baz' | cut -d' ' -f2
 #   [ "$status" -eq 0 ]
 #   [ "$output" = "bar" ]
 # }
 #
 # testcase_skip() {
-#   this_test "is skipped"
+#   it "is skipped"
 #   skip "foo command returns 0 but not now"
 #   run foo
 #   [ "$status" -eq 0 ]
 # }
 #
 # testcase_fail() {
-#   this_test "always fails"
+#   it "always fails"
 #   false
 # }
 #
 # unittest_run "$@"
 # ..
 #
-# Let's say the example script is saved as `test_example.sh`.
-# Execute the script as a standard bash script, then the output on the
+# Let's say the example script is saved as `test_example.sh`. Execute
+# the script as a standard bash script, then the output on the
 # terminal looks like this.
 #
 # --
@@ -64,9 +64,9 @@
 # The order to execute test cases is sorted alphabetically. Each test
 # case is defined as a function whose name starts with `testcase_`.
 # Inside the test case a short description of the test should be put
-# in the first line with the `this_test` helper command. Afterwards,
-# standard shell commands can be written. If every command exits with
-# the `0` status, the test passes.
+# in the first line with the `it` helper command. Afterwards, standard
+# shell commands can be written. If every command exits with the `0`
+# status, the test passes.
 #
 # The hepler command `run` invokes arguments as a bash command, then
 # stores its exit status in a variable `$status`. The `run` command
@@ -156,7 +156,7 @@ _unittest_testcase=
 _unittest_testcase_definition=
 
 # Contains a string which describes the current test case. It is given
-# by the `this_test` command.
+# by the `it` command.
 _unittest_description=
 
 # Contains notes why a test case is skipped. It is given as an
@@ -373,7 +373,7 @@ teardown() {
   :
 }
 
-this_test() {
+it() {
   _unittest_description="${1:-anonymous test}"
 }
 

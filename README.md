@@ -23,8 +23,8 @@ passes.
 
 ### Installation
 
-A test script can be written as a standard bash script, so you
-should put a shebang to the head of a script like:
+A test script can be written as a standard bash script, so you should
+put a shebang to the head of a script like:
 
 ``` shell
 #!/usr/bin/env bash
@@ -40,13 +40,13 @@ source unittest.sh
 
 Each test case is defined as a function whose name starts with
 `testcase_`. Inside a test case a short description of the test should
-be put in the first line with the `this_test` helper command.
-Afterwards, standard shell commands can be written. If every command
-exits with the `0` status, the test passes.
+be put in the first line with the `it` helper command. Afterwards,
+standard shell commands can be written. If every command exits with
+the `0` status, the test passes.
 
 ``` shell
 testcase_add() {
-    this_test "adds numbers unsing bc"
+    it "adds numbers unsing bc"
     result="$(echo 2+2 | bc)"
     [ "$result" -eq 4 ]
 }
@@ -64,7 +64,7 @@ command is show below:
 
 ``` shell
 testcase_run() {
-    this_test "gets the word 'bar' with cut command"
+    it "gets the word 'bar' with cut command"
     run echo 'foo bar baz' | cut -d' ' -f2
     [ "$status" -eq 0 ]
     [ "$output" = "bar" ]
@@ -79,7 +79,7 @@ argument. Tha usage is shown in the code below:
 
 ``` shell
 testcase_skip() {
-    this_test "is skipped"
+    it "is skipped"
     skip "foo command return 0 but not now"
     run foo
     [ "$status" -eq 0 ]
