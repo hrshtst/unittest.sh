@@ -57,12 +57,6 @@ teardown() {
   copy_array reserved_skipped_tests _unittest_skipped_tests
 }
 
-testcase_num_collect_tests() {
-  it "should check number of collected test cases"
-
-  [ ${#_unittest_all_tests[@]} -eq 5 ]
-}
-
 testcase_initialize() {
   it "should initialize variables used throughout running tests"
 
@@ -82,6 +76,12 @@ testcase_initialize() {
   [ ${#_unittest_passed_tests[@]} -eq 0 ]
   [ ${#_unittest_failed_tests[@]} -eq 0 ]
   [ ${#_unittest_skipped_tests[@]} -eq 0 ]
+}
+
+testcase_num_collect_tests() {
+  it "should check number of collected test cases"
+
+  [ ${#_unittest_all_tests[@]} -eq 5 ]
 }
 
 testcase_make_word_plural() {
