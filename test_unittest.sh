@@ -78,10 +78,41 @@ testcase_initialize() {
   [ ${#_unittest_skipped_tests[@]} -eq 0 ]
 }
 
+testcase_reset_vars() {
+  it "should reset variables to their defaults"
+  reserved_description=$_unittest_description
+
+  # Given that fake values are assigned,
+  _unittest_testcase="testcase_dummy"
+  _unittest_testcase_definition="testcase_dummy() {:}"
+  _unittest_description="testcase_dummy"
+  _unittest_skip_note="skip the dummy test"
+  _unittest_failed=true
+  _unittest_skipped=true
+  _unittest_err_source=("test_unittest.sh")
+  _unittest_err_lineno=("105")
+  _unittest_err_status=("1")
+  # When the variables are reset,
+  _unittest_reset_vars
+  # Then they are set to their defaults.
+  [ -z $_unittest_testcase ]
+  [ -z $_unittest_testcase_definition ]
+  [ -z $_unittest_description ]
+  [ -z $_unittest_skip_note ]
+  [ $_unittest_failed = false ]
+  [ $_unittest_skipped = false ]
+  [ ${#_unittest_err_source[@]} -eq 0 ]
+  [ ${#_unittest_err_lineno[@]} -eq 0 ]
+  [ ${#_unittest_err_status[@]} -eq 0 ]
+
+  _unittest_testcase=${FUNCNAME[0]}
+  _unittest_description=$reserved_description
+}
+
 testcase_num_collect_tests() {
   it "should check number of collected test cases"
 
-  [ ${#_unittest_all_tests[@]} -eq 5 ]
+  [ ${#_unittest_all_tests[@]} -eq 6 ]
 }
 
 testcase_make_word_plural() {

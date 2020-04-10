@@ -251,19 +251,63 @@ _unittest_errtrap() {
   fi
 }
 
-_unittest_preprocesses() {
-  _unittest_testcase="$1"
-
-  local definition
-  definition="$(declare -f "$_unittest_testcase")"
-
-  # initialize variables
+######################################################################
+# Reset variables which store the result and attributes of each test
+# to their default values. This function should be executed prior to
+# running each test.
+# Globals:
+#   _unittest_testcase
+#   _unittest_testcase_definition
+#   _unittest_description
+#   _unittest_skip_note
+#   _unittest_failed
+#   _unittest_skipped
+#   _unittest_err_source
+#   _unittest_err_lineno
+#   _unittest_err_status
+# Arguments:
+#   None
+######################################################################
+_unittest_reset_vars() {
+  _unittest_testcase=
+  _unittest_testcase_definition=
   _unittest_description=
+  _unittest_skip_note=
   _unittest_failed=false
   _unittest_skipped=false
   _unittest_err_source=()
   _unittest_err_lineno=()
   _unittest_err_status=()
+}
+
+######################################################################
+# To achieve the skip functionality, skim the current test case and
+# add a statement `return 0` shortly following the `skip` command if
+# it exisis.
+# Globals:
+#   None
+# Arguments:
+#   Test case to be handled, a function name
+######################################################################
+_unittest_handle_skipped_test() {
+  :
+}
+
+######################################################################
+# Execute pre-processing stuff before running each test.
+# Globals:
+#   None
+# Arguments:
+#   Test case to run, a function name.
+######################################################################
+_unittest_preprocesses() {
+  # reset variables
+  _unittest_reset_vars
+
+  _unittest_testcase="$1"
+
+  local definition
+  definition="$(declare -f "$_unittest_testcase")"
 
   # pre-process for a skipped test
   if echo "$definition" | grep -q "^[[:space:]]\+skip"; then
