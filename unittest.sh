@@ -203,6 +203,19 @@ lines=()
 
 ### Internal helper functions
 
+######################################################################
+# Initialize global variables listed below which are used throughout
+# running all tests.
+# Globals:
+#   _unittest_all_tests
+#   _unittest_tests_map
+#   _unittest_executed_tests
+#   _unittest_passed_tests
+#   _unittest_failed_tests
+#   _unittest_skipped_tests
+# Arguments:
+#   None
+######################################################################
 _unittest_initialize() {
   _unittest_all_tests=()
   # unset _unittest_tests_map
@@ -213,6 +226,18 @@ _unittest_initialize() {
   _unittest_skipped_tests=()
 }
 
+######################################################################
+# Executed when ERR signal is caught. Turn the failed flag on and
+# store the source file, the location and the status code where the
+# ERR signal has been sent.
+# Globals:
+#   _unittest_failed
+#   _unittest_err_source
+#   _unittest_err_lineno
+#   _unittest_err_status
+# Arguments:
+#   None
+######################################################################
 _unittest_errtrap() {
   # Keep the exit status returned by the last function or command.
   local _status="$?"
