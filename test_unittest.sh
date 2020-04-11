@@ -10,7 +10,7 @@ source unittest.sh
 copy_array() {
   local src="$1"
   local dst="$2"
-  local src_repr="$(declare -p $1)"
+  local src_repr="$(declare -p $src)"
   local src_elem="${src_repr#*=}"
   local src_type="${src_repr:9:1}"
 
@@ -60,16 +60,16 @@ teardown() {
 testcase_initialize() {
   it "should initialize variables used throughout running tests"
 
-  # assign fake values
+  # Given that fake values are assigned,
   _unittest_all_tests=("testcase_dummy")
   _unittest_tests_map=(["is a dummy test"]="testcase_dummy")
   _unittest_executed_tests=("testcase_dummy")
   _unittest_passed_tests=("testcase_dummy")
   _unittest_failed_tests=("testcase_dummy")
   _unittest_skipped_tests=("testcase_dummy")
-
+  # When the function is called,
   _unittest_initialize
-
+  # Then they are initialized.
   [ ${#_unittest_all_tests[@]} -eq 0 ]
   # [ ${#_unittest_tests_map[@]} -eq 0 ]
   [ ${#_unittest_executed_tests[@]} -eq 0 ]
@@ -83,8 +83,6 @@ testcase_reset_vars() {
   reserved_description=$_unittest_description
 
   # Given that fake values are assigned,
-  _unittest_testcase="testcase_dummy"
-  _unittest_testcase_definition="testcase_dummy() {:}"
   _unittest_description="testcase_dummy"
   _unittest_skip_note="skip the dummy test"
   _unittest_failed=true
@@ -95,8 +93,6 @@ testcase_reset_vars() {
   # When the variables are reset,
   _unittest_reset_vars
   # Then they are set to their defaults.
-  [ -z $_unittest_testcase ]
-  [ -z $_unittest_testcase_definition ]
   [ -z $_unittest_description ]
   [ -z $_unittest_skip_note ]
   [ $_unittest_failed = false ]
@@ -105,14 +101,52 @@ testcase_reset_vars() {
   [ ${#_unittest_err_lineno[@]} -eq 0 ]
   [ ${#_unittest_err_status[@]} -eq 0 ]
 
-  _unittest_testcase=${FUNCNAME[0]}
   _unittest_description=$reserved_description
+}
+
+mock_not_skip() {
+  true
+}
+
+mock_skip() {
+  skip
+  false
+}
+
+mock_skip_handled() {
+  skip
+  return 0
+  false
+}
+
+testcase_handle_not_skipped_test() {
+  it "should do nothing for a test which is not skipped"
+
+  # Given that a test case definition which is not going to be skipped,
+  local test_def1="$(declare -f mock_not_skip)"
+  # When the test case should not be skipped,
+  _unittest_handle_skipped_test "mock_not_skip"
+  # Then do nothing.
+  local test_def2="$(declare -f mock_not_skip)"
+  [ "$test_def1" = "$test_def2" ]
+}
+
+testcase_handle_skipped_test() {
+  it "should handle a skipped test"
+
+  # Given that a test case definition which is going to be skipped,
+  # When the test case should be skipped,
+  _unittest_handle_skipped_test "mock_skip"
+  # Then add `return 0` shortly after the `skip` command.
+  local test_def1="$(declare -f mock_skip | sed '1d')"
+  local test_def2="$(declare -f mock_skip_handled | sed '1d')"
+  [ "$test_def1" = "$test_def2" ]
 }
 
 testcase_num_collect_tests() {
   it "should check number of collected test cases"
 
-  [ ${#_unittest_all_tests[@]} -eq 6 ]
+  [ ${#_unittest_all_tests[@]} -eq 8 ]
 }
 
 testcase_make_word_plural() {

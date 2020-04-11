@@ -150,11 +150,6 @@ _unittest_skipped_tests=()
 # collected automatically by `unittest_collect_testcases`.
 _unittest_testcase=
 
-# Contains the definition of the function `$_unittest_testcase`. If
-# the `skip` command exists inside it, a statement `return 0;` is
-# added to just below the `skip` command while running pre-process.
-_unittest_testcase_definition=
-
 # Contains a string which describes the current test case. It is given
 # by the `it` command.
 _unittest_description=
@@ -218,7 +213,7 @@ lines=()
 ######################################################################
 _unittest_initialize() {
   _unittest_all_tests=()
-  # unset _unittest_tests_map
+  # unset -v _unittest_tests_map
   # declare -A _unittest_tests_map
   _unittest_executed_tests=()
   _unittest_passed_tests=()
@@ -256,8 +251,6 @@ _unittest_errtrap() {
 # to their default values. This function should be executed prior to
 # running each test.
 # Globals:
-#   _unittest_testcase
-#   _unittest_testcase_definition
 #   _unittest_description
 #   _unittest_skip_note
 #   _unittest_failed
@@ -269,8 +262,6 @@ _unittest_errtrap() {
 #   None
 ######################################################################
 _unittest_reset_vars() {
-  _unittest_testcase=
-  _unittest_testcase_definition=
   _unittest_description=
   _unittest_skip_note=
   _unittest_failed=false
@@ -290,7 +281,17 @@ _unittest_reset_vars() {
 #   Test case to be handled, a function name
 ######################################################################
 _unittest_handle_skipped_test() {
-  :
+  local testcase="$1"
+  local definition="$(declare -f "$testcase")"
+  local new_definition=
+
+  # replace `skip` with `skip; return 0;`
+  if echo "$definition" | grep -q "^[[:space:]]\+skip"; then
+    local cmd
+    cmd="s/^\([[:space:]]\+\)skip\(.*\);/\1skip\2;\n\1return 0;/"
+    new_definition="$(echo "$definition" | sed -e "$cmd")"
+    eval "$new_definition"
+  fi
 }
 
 ######################################################################
@@ -302,20 +303,9 @@ _unittest_handle_skipped_test() {
 ######################################################################
 _unittest_preprocesses() {
   # reset variables
-  _unittest_reset_vars
-
   _unittest_testcase="$1"
-
-  local definition
-  definition="$(declare -f "$_unittest_testcase")"
-
-  # pre-process for a skipped test
-  if echo "$definition" | grep -q "^[[:space:]]\+skip"; then
-    local cmd
-    cmd="s/^\([[:space:]]\+\)skip\(.*\);/\1skip\2;\n\1return 0;/"
-    _unittest_testcase_definition="$(echo "$definition" | sed -e "$cmd")"
-    eval "$_unittest_testcase_definition"
-  fi
+  _unittest_reset_vars
+  _unittest_handle_skipped_test "$_unittest_testcase"
 }
 
 _unittest_postprocesses() {
