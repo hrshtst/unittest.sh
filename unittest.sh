@@ -297,14 +297,16 @@ _unittest_handle_skipped_test() {
 ######################################################################
 # Execute pre-processing stuff before running each test.
 # Globals:
-#   None
+#   _unittest_testcase
 # Arguments:
 #   Test case to run, a function name.
 ######################################################################
 _unittest_preprocesses() {
-  # reset variables
+  # set the function name of the current test case
   _unittest_testcase="$1"
+  # reset variables
   _unittest_reset_vars
+  # handle a skipped test
   _unittest_handle_skipped_test "$_unittest_testcase"
 }
 
