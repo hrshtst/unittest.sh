@@ -143,10 +143,76 @@ testcase_handle_skipped_test() {
   [ "$test_def1" = "$test_def2" ]
 }
 
+testcase_categorize_by_result_passed() {
+  it "should categorize a test into an appropriate group if it's passed"
+
+  # Given that the test case is passed,
+  _unittest_skipped=false
+  _unittest_failed=false
+  local testcase="testcase_dummy"
+  _unittest_executed_tests=()
+  _unittest_passed_tests=()
+  _unittest_failed_tests=()
+  _unittest_skipped_tests=()
+  # When the function is executed,
+  _unittest_categorize_by_result "$testcase"
+  # Then the function is categorized into passed.
+  [ "${_unittest_executed_tests[0]}" = "$testcase" ]
+  [ "${_unittest_passed_tests[0]}" = "$testcase" ]
+  [ ${#_unittest_failed_tests[@]} -eq 0 ]
+  [ ${#_unittest_skipped_tests[@]} -eq 0 ]
+}
+
+testcase_categorize_by_result_failed() {
+  it "should categorize a test into an appropriate group if it's failed"
+
+  # Given that the test case is passed,
+  _unittest_skipped=false
+  _unittest_failed=true
+  local testcase="testcase_dummy"
+  _unittest_executed_tests=()
+  _unittest_passed_tests=()
+  _unittest_failed_tests=()
+  _unittest_skipped_tests=()
+  # When the function is executed,
+  _unittest_categorize_by_result "$testcase"
+  # Then the function is categorized into passed.
+  [ "${_unittest_executed_tests[0]}" = "$testcase" ]
+  [ ${#_unittest_passed_tests[@]} -eq 0 ]
+  [ "${_unittest_failed_tests[0]}" = "$testcase" ]
+  [ ${#_unittest_skipped_tests[@]} -eq 0 ]
+
+  if ((${#_unittest_err_status[@]} == 0)); then
+    _unittest_failed=false
+  fi
+}
+
+testcase_categorize_by_result_skipped() {
+  it "should categorize a test into an appropriate group if it's skipped"
+
+  # Given that the test case is passed,
+  _unittest_skipped=true
+  _unittest_failed=false
+  local testcase="testcase_dummy"
+  _unittest_executed_tests=()
+  _unittest_passed_tests=()
+  _unittest_failed_tests=()
+  _unittest_skipped_tests=()
+  # When the function is executed,
+  _unittest_categorize_by_result "$testcase"
+  # Then the function is categorized into passed.
+  [ "${_unittest_executed_tests[0]}" = "$testcase" ]
+  [ ${#_unittest_passed_tests[@]} -eq 0 ]
+  [ ${#_unittest_failed_tests[@]} -eq 0 ]
+  [ "${_unittest_skipped_tests[0]}" = "$testcase" ]
+
+  _unittest_skipped=false
+}
+
 testcase_num_collect_tests() {
   it "should check number of collected test cases"
 
-  [ ${#_unittest_all_tests[@]} -eq 8 ]
+  [ ${#_unittest_all_tests[@]} -eq 11 ]
 }
 
 testcase_make_word_plural() {

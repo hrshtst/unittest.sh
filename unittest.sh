@@ -310,14 +310,43 @@ _unittest_preprocesses() {
   _unittest_handle_skipped_test "$_unittest_testcase"
 }
 
-_unittest_postprocesses() {
+######################################################################
+# Categorize an executed test case into one of the groups, passed,
+# failed or skipped.
+# Gloabls:
+#   _unittest_failed
+#   _unittest_skipped
+#   _unittest_passed_tests
+#   _unittest_failed_tests
+#   _unittest_skipped_tests
+# Arguments:
+#   Test case to run, a function name
+######################################################################
+_unittest_categorize_by_result() {
+  local testcase="$1"
+
+  _unittest_executed_tests+=("$testcase")
   if [[ $_unittest_skipped = true ]]; then
-    _unittest_skipped_tests+=("$_unittest_testcase")
+    _unittest_skipped_tests+=("$testcase")
   elif [[ $_unittest_failed = true ]]; then
-    _unittest_failed_tests+=("$_unittest_testcase")
+    _unittest_failed_tests+=("$testcase")
   else
-    _unittest_passed_tests+=("$_unittest_testcase")
+    _unittest_passed_tests+=("$testcase")
   fi
+}
+
+######################################################################
+# Execute post-processing stuff after running each test.
+# Globals:
+#   _unittest_skipped_tests
+#   _unittest_failed_tests
+#   _unittest_passed_tests
+# Arguments:
+#   Test case to run, a function name
+######################################################################
+_unittest_postprocesses() {
+  local testcase="$1"
+  _unittest_categorize_by_result "$testcase"
 }
 
 # define colors of faces for printing results.
@@ -397,7 +426,7 @@ unittest_run_testcases() {
     setup
     $_unittest_testcase
     teardown
-    _unittest_postprocesses
+    _unittest_postprocesses "$testcase"
     _unittest_print_result
   done
 }
