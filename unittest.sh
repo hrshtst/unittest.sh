@@ -455,6 +455,16 @@ unittest_print_summary() {
 
 ### Helper commands
 
+######################################################################
+# `setup` and `teardown` commands allow you to define a series of
+# commands that will be executed before and after each test case,
+# respectively. These are supposed to be overwitten in user's test
+# script.
+# Globals:
+#   None
+# Arguments:
+#   None
+######################################################################
 setup() {
   :
 }
@@ -463,19 +473,59 @@ teardown() {
   :
 }
 
+######################################################################
+# `it` command allows you to give a short description of each test
+# case to the test runner
+# Globals:
+#   _unjittest_description
+# Arguments:
+#   Description of test case, string
+######################################################################
 it() {
   _unittest_description="${1:-anonymous test}"
 }
 
+######################################################################
+# `run` command allows you to invoke arguments as a bash command, then
+# store its exit status in a variable `$status`. The `run` command
+# exits with `0` status so that you can continue following assertions.
+# Also, the `$output` variable contains the contents of the standard
+# output and the standard error.
+# Globals:
+#   status
+#   output
+#   lines
+# Arguments:
+#   Command and its arguments
+######################################################################
 run() {
   :
 }
 
+######################################################################
+# `skip` command allows you to skip a test case inside which it is
+# executed. It accepts the reason for skipping as an additional
+# argument.
+# Globals:
+#   _unittest_skip_note
+#   _unittest_skipped
+# Arguments:
+#   Reason for skipping, string (optional)
+######################################################################
 skip() {
   _unittest_skip_note="${1:-}"
   _unittest_skipped=true
 }
 
+######################################################################
+# Perform the primary test runner. This carries out the initial setup,
+# the decision of test cases, the execution of them and the printing
+# of the result, sequentially.
+# Globals:
+#   None
+# Arguments:
+#   None
+######################################################################
 unittest_run() {
   unittest_setup
   unittest_collect_testcases
