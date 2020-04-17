@@ -183,7 +183,7 @@ _unittest_err_status=()
 # Contains an exit status when running a bash command with the `run`
 # command.
 export status
-status=
+status=0
 
 # Contains a string combined the standard output and the standard
 # error of a bash command executed with the `run` command.
@@ -269,6 +269,9 @@ _unittest_reset_vars() {
   _unittest_err_source=()
   _unittest_err_lineno=()
   _unittest_err_status=()
+  status=0
+  output=
+  lines=()
 }
 
 ######################################################################
@@ -499,7 +502,14 @@ it() {
 #   Command and its arguments
 ######################################################################
 run() {
-  :
+  if (( $# == 0 )); then
+    return 0
+  fi
+  local cmd="$1"; shift
+  output="$($cmd "$@" 2>&1)"
+  status=$?
+  mapfile -t lines < <(echo "$output")
+  return 0
 }
 
 ######################################################################

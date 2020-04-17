@@ -90,6 +90,9 @@ testcase_reset_vars() {
   _unittest_err_source=("test_unittest.sh")
   _unittest_err_lineno=("105")
   _unittest_err_status=("1")
+  status=1234
+  output="hoge"
+  lines=("hoge" "fuga" "foo")
   # When the variables are reset,
   _unittest_reset_vars
   # Then they are set to their defaults.
@@ -100,6 +103,9 @@ testcase_reset_vars() {
   [ ${#_unittest_err_source[@]} -eq 0 ]
   [ ${#_unittest_err_lineno[@]} -eq 0 ]
   [ ${#_unittest_err_status[@]} -eq 0 ]
+  [ $status -eq 0 ]
+  [ -z $output ]
+  [ ${#lines[@]} -eq 0 ]
 
   _unittest_description=$reserved_description
 }
@@ -209,10 +215,94 @@ testcase_categorize_by_result_skipped() {
   _unittest_skipped=false
 }
 
+foo() {
+  return 10
+}
+
+testcase_run_return_0() {
+  it "should always return 0"
+  local _status
+
+  # No arguments.
+  run
+  _status=$?
+  [ $_status -eq 0 ]
+
+  # Provide arguments which exits with zero.
+  run true
+  _status=$?
+  [ $_status -eq 0 ]
+
+  # Provide arguments which exits with non-zero.
+  run false
+  _status=$?
+  [ $_status -eq 0 ]
+}
+
+testcase_run_capture_status() {
+  it "should capture status code returned by command with run"
+
+  run foo
+  [ $status -eq 10 ]
+}
+
+echo_stderr() {
+  echo "$@" >&2
+}
+
+echo_whitebeard() {
+  echo "Edward Newgate"
+  echo "the Phoenix Marco" >&2
+}
+
+testcase_run_capture_output() {
+  it "should capture output from arguments provided with the run command"
+
+  # capture the standard output.
+  run echo "the king of the pirates"
+  [ "$output" = "the king of the pirates" ]
+
+  # capture the standard error.
+  run echo_stderr "the Fire Fist Ace"
+  [ "$output" = "the Fire Fist Ace" ]
+
+  # capture the standard output and the standard error.
+  local expected=$'Edward Newgate\nthe Phoenix Marco'
+  run echo_whitebeard
+  [ "$output" = "$expected" ]
+}
+
+echo_straw_hat_pirates() {
+  echo "Monkey D. Luffy"
+  echo "Roronoa Zoro" >&2
+  echo "Nami"
+  echo "Usopp" >&2
+  echo "Vinsmoke Sanji"
+  echo "Tony Tony Chopper" >&2
+  echo "Nico Robin"
+  echo "Franky" >&2
+  echo "Brook"
+}
+
+testcase_run_capture_lines() {
+  it "should capture output from arguments provided with the run line by line"
+
+  run echo_straw_hat_pirates
+  [ "${lines[0]}" = "Monkey D. Luffy" ]
+  [ "${lines[1]}" = "Roronoa Zoro" ]
+  [ "${lines[2]}" = "Nami" ]
+  [ "${lines[3]}" = "Usopp" ]
+  [ "${lines[4]}" = "Vinsmoke Sanji" ]
+  [ "${lines[5]}" = "Tony Tony Chopper" ]
+  [ "${lines[6]}" = "Nico Robin" ]
+  [ "${lines[7]}" = "Franky" ]
+  [ "${lines[8]}" = "Brook" ]
+}
+
 testcase_num_collect_tests() {
   it "should check number of collected test cases"
 
-  [ ${#_unittest_all_tests[@]} -eq 11 ]
+  [ ${#_unittest_all_tests[@]} -eq 15 ]
 }
 
 testcase_make_word_plural() {
