@@ -371,7 +371,7 @@ _unittest_print_result_fail() {
     lineno="${_unittest_err_lineno[$i]}"
     failure_location="$(printf "test file %s, line %d" "$source" "$lineno")"
     failure_detail="$(sed -e "${lineno}q;d" "$source" | sed -e "s/^[[:space:]]*//")"
-    printf "%s   (in %s)\n     \`%s\' failed with %d%s\n"\
+    printf "%s   (in %s)\n     \`%s' failed with %d%s\n"\
            "$brightred" "$failure_location" "$failure_detail" \
            "${_unittest_err_status[$i]}" "$reset"
   done

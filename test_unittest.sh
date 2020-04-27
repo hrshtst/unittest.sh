@@ -299,6 +299,36 @@ testcase_run_capture_lines() {
   [ "${lines[8]}" = "Brook" ]
 }
 
+testcase_print_result_pass() {
+  it "should print the result for a passed test case"
+
+  run _unittest_print_result_pass
+  [ "${lines[0]}" = " ✓ should print the result for a passed test case" ]
+}
+
+testcase_print_result_fail() {
+  it "should print the result for a failed test case"
+
+  false
+  _unittest_failed=false
+  run _unittest_print_result_fail
+  [ "${lines[0]}" = "$(tput setaf 1) ✗ should print the result for a failed test case$(tput sgr0)" ]
+  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line 322)" ]
+  [ "${lines[2]}" = "     \`false' failed with 1$(tput sgr0)" ]
+}
+
+testcase_print_result_skip() {
+  it "should print the result for a skipped test case"
+
+  run _unittest_print_result_skip
+  [ "${lines[0]}" = " - should print the result for a skipped test case (skipped)" ]
+
+  _unittest_skip_note="this is skipped"
+  run _unittest_print_result_skip
+  [ "${lines[0]}" =\
+    " - should print the result for a skipped test case (skipped: this is skipped)" ]
+}
+
 testcase_num_collect_tests() {
   it "should check number of collected test cases"
 
