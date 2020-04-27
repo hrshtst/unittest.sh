@@ -493,7 +493,8 @@ it() {
 # store its exit status in a variable `$status`. The `run` command
 # exits with `0` status so that you can continue following assertions.
 # Also, the `$output` variable contains the contents of the standard
-# output and the standard error.
+# output and the standard error. If the given arguments cannot be
+# found, it return non-zero value to make the test explicitly fail.
 # Globals:
 #   status
 #   output
@@ -506,9 +507,17 @@ run() {
     return 0
   fi
   local cmd="$1"; shift
-  output="$($cmd "$@" 2>&1)"
-  status=$?
-  mapfile -t lines < <(echo "$output")
+  local lineno="${BASH_LINENO[0]}"
+  local source="${BASH_SOURCE[1]}"
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    printf >&2 "%s: line %d: %s: command not found\n"\
+               "$source" "$lineno" "$cmd"
+    return 1
+  else
+    output="$($cmd "$@" 2>&1)"
+    status=$?
+    mapfile -t lines < <(echo "$output")
+  fi
   return 0
 }
 

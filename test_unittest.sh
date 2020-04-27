@@ -299,6 +299,16 @@ testcase_run_capture_lines() {
   [ "${lines[8]}" = "Brook" ]
 }
 
+testcase_run_throw_error_when_command_not_found() {
+  it "should make run throw an error when command not found"
+
+  local _status
+  run hoge 2>/dev/null
+  _status=$?
+  _unittest_failed=false
+  [ $_status -ne 0 ]
+}
+
 testcase_print_result_pass() {
   it "should print the result for a passed test case"
 
@@ -332,7 +342,7 @@ testcase_print_result_skip() {
 testcase_num_collect_tests() {
   it "should check number of collected test cases"
 
-  [ ${#_unittest_all_tests[@]} -eq 15 ]
+  [ ${#_unittest_all_tests[@]} -eq 19 ]
 }
 
 testcase_make_word_plural() {
