@@ -393,13 +393,24 @@ _unittest_print_result() {
   fi
 }
 
-__make_word_plural() {
-  local word n
-  word="$1"
-  n="$2"
+
+######################################################################
+# Pluralize a word based on its count. When the count is omitted,
+# always make the word plural.
+# Globals:
+#   None
+# Arguments:
+#   A singular word, a string.
+#   The count of the word, a number.
+# Outputs:
+#   Writes pluralized or singular word to stdout.
+######################################################################
+pluralize() {
+  local word="$1"
+  local n="${2:-0}"
 
   if (( n == 1 )); then
-    echo "$word"
+    echo "${word}"
   else
     echo "${word}s"
   fi
@@ -445,8 +456,8 @@ unittest_print_summary() {
 
   # make summary text
   summary=""
-  summary+="$(printf "%d %s" $n_tests "$(__make_word_plural test $n_tests)")"
-  summary+="$(printf ", %d %s" $n_failed "$(__make_word_plural failure $n_failed)")"
+  summary+="$(printf "%d %s" $n_tests "$(pluralize test $n_tests)")"
+  summary+="$(printf ", %d %s" $n_failed "$(pluralize failure $n_failed)")"
   if (( n_skipped > 0 )); then
     summary+="$(printf ", %d skipped" $n_skipped)"
   fi

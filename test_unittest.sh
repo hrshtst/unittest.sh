@@ -345,15 +345,19 @@ testcase_num_collect_tests() {
   [ ${#_unittest_all_tests[@]} -eq 19 ]
 }
 
-testcase_make_word_plural() {
-  it "makes a word plural correctly"
+testcase_pluralize_regular() {
+  it "should pluralize a regular noun based on its count"
 
-  [ "$(__make_word_plural "test" 0)" = "tests" ]
-  [ "$(__make_word_plural "test" 1)" = "test" ]
-  [ "$(__make_word_plural "test" 2)" = "tests" ]
-  [ "$(__make_word_plural "failure" 0)" = "failures" ]
-  [ "$(__make_word_plural "failure" 1)" = "failure" ]
-  [ "$(__make_word_plural "failure" 2)" = "failures" ]
+  # case 1
+  [ "$(pluralize test)" = "tests" ]
+  [ "$(pluralize test 0)" = "tests" ]
+  [ "$(pluralize test 1)" = "test" ]
+  [ "$(pluralize test 2)" = "tests" ]
+  # case 2
+  [ "$(pluralize failure)" = "failures" ]
+  [ "$(pluralize failure 0)" = "failures" ]
+  [ "$(pluralize failure 1)" = "failure" ]
+  [ "$(pluralize failure 2)" = "failures" ]
 }
 
 unittest_run "$@"
