@@ -215,6 +215,18 @@ testcase_categorize_by_result_skipped() {
   _unittest_skipped=false
 }
 
+testcase_it() {
+  local _desc="should store the description of the test case"
+  it "$_desc"
+  [ "$_unittest_description" = "$_desc" ]
+
+  it
+  [ "$_unittest_description" = "anonymous test" ]
+
+  it should store the description of the test case
+  [ "$_unittest_description" = "$_desc" ]
+}
+
 foo() {
   return 10
 }
@@ -323,7 +335,7 @@ testcase_print_result_fail() {
   _unittest_failed=false
   run _unittest_print_result_fail
   [ "${lines[0]}" = "$(tput setaf 1) ✗ should print the result for a failed test case$(tput sgr0)" ]
-  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line 322)" ]
+  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line 334)" ]
   [ "${lines[2]}" = "     \`false' failed with 1$(tput sgr0)" ]
 }
 
@@ -342,7 +354,7 @@ testcase_print_result_skip() {
 testcase_num_collect_tests() {
   it "should check number of collected test cases"
 
-  [ ${#_unittest_all_tests[@]} -eq 19 ]
+  [ ${#_unittest_all_tests[@]} -eq 20 ]
 }
 
 testcase_pluralize_regular() {

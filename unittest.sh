@@ -496,7 +496,7 @@ teardown() {
 #   Description of test case, string
 ######################################################################
 it() {
-  _unittest_description="${1:-anonymous test}"
+  _unittest_description="${*:-anonymous test}"
 }
 
 ######################################################################
