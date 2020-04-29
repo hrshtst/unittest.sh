@@ -298,6 +298,23 @@ _unittest_handle_skipped_test() {
 }
 
 ######################################################################
+# Shows the description of the current test case. If no description provided, just its function name will be shown.
+# Globals:
+#   _unittest_description
+# Arguments:
+#   None.
+# Outputs:
+#   Writes its description to stdout.
+######################################################################
+_unittest_describe() {
+  if [[ -z "$_unittest_description" ]]; then
+    echo "$_unittest_testcase"
+  else
+    echo "$_unittest_description"
+  fi
+}
+
+######################################################################
 # Execute pre-processing stuff before running each test.
 # Globals:
 #   _unittest_testcase
@@ -358,14 +375,14 @@ red=$(tput setaf 1)
 brightred=$(tput setaf 9)
 
 _unittest_print_result_pass() {
-  printf " ✓ %s\n" "$_unittest_description"
+  printf " ✓ %s\n" "$(_unittest_describe)"
 }
 
 _unittest_print_result_fail() {
   local source lineno
   local failure_location failure_detail
 
-  printf "%s ✗ %s%s\n" "$red" "$_unittest_description" "$reset"
+  printf "%s ✗ %s%s\n" "$red" "$(_unittest_describe)" "$reset"
   for i in "${!_unittest_err_status[@]}"; do
     source="${_unittest_err_source[$i]}"
     lineno="${_unittest_err_lineno[$i]}"
@@ -380,7 +397,7 @@ _unittest_print_result_fail() {
 _unittest_print_result_skip() {
   local skip_note
   skip_note="${_unittest_skip_note:+: }${_unittest_skip_note}"
-  printf " - %s (skipped%s)\n" "$_unittest_description" "$skip_note"
+  printf " - %s (skipped%s)\n" "$(_unittest_describe)" "$skip_note"
 }
 
 _unittest_print_result() {
