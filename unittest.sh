@@ -483,8 +483,56 @@ pluralize() {
 
 ### Core functions
 
+######################################################################
+# Set up stuff to run tests.
+# Globals:
+#   None
+# Arguments:
+#   None
+######################################################################
 unittest_setup() {
   _unittest_initialize
+}
+
+######################################################################
+# Show help message to the standard output.
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Help message to the stdout.
+######################################################################
+unittest_help() {
+  cat <<- EOT
+Run unit tests defined in \`${_unittest_script_filename#./}' and print
+the result of each test case and the summary.
+
+Usage: $0 [-l] [-f] [-h] <test-spec> ...
+
+<test-spec> ...     Specify which tests to run. Given no test specs
+                    supplied all test cases are run.
+-l, --list-tests    List available tests.
+-f, --force-run     Force to run tests including skipping ones.
+-h, --help          Print this message.
+
+Notice for test specs:
+Test specs must be enclosed in quotes if they contain spaces. They are
+case insensitive. A wildcard charcter, namely *, can substitue for any
+number of any characters.
+
+EOT
+}
+
+######################################################################
+# Parse command line arguments.
+# Globals:
+#   None
+# Arguments:
+#   Command line arguments
+######################################################################
+unittest_parse() {
+  unittest_help
 }
 
 unittest_collect_testcases() {
