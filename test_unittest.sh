@@ -385,4 +385,25 @@ testcase_pluralize_regular() {
   [ "$(pluralize failure 2)" = "failures" ]
 }
 
+testcase_pluralize_ends_in_s() {
+  it "should add -es to the end if the the noun ends in -s"
+
+  # bus
+  [ "$(pluralize bus)" = "buses" ]
+  [ "$(pluralize bus 0)" = "buses" ]
+  [ "$(pluralize bus 1)" = "bus" ]
+  [ "$(pluralize bus 2)" = "buses" ]
+  # brass
+  [ "$(pluralize brass)" = "brasses" ]
+  [ "$(pluralize brass 0)" = "brasses" ]
+  [ "$(pluralize brass 1)" = "brass" ]
+  [ "$(pluralize brass 2)" = "brasses" ]
+}
+
+testcase_num_collect_tests() {
+  it "should check number of collected test cases"
+
+  [ ${#_unittest_all_tests[@]} -eq 23 ]
+}
+
 unittest_run "$@"

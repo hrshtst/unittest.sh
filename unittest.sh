@@ -449,7 +449,9 @@ endswith() {
 
 ######################################################################
 # Pluralize a word based on its count. When the count is omitted,
-# always make the word plural.
+# always make the word plural. (Not implemented completely yet.)
+# TODO:
+#   Implement irregular cases.
 # Globals:
 #   None
 # Arguments:
@@ -463,8 +465,17 @@ pluralize() {
   local n="${2:-0}"
 
   if (( n == 1 )); then
+    # Return a singular $word.
     echo "${word}"
+    return 0
+  fi
+
+  # Make $word plural based on its suffix.
+  if endswith "$word" "s"; then
+    # Append -es as $word ends in s.
+    echo "${word}es"
   else
+    # Append -es as $word is a regular noun.
     echo "${word}s"
   fi
 }
