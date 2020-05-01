@@ -199,6 +199,17 @@ lines=()
 ### Internal helper functions
 
 ######################################################################
+# Output an error message to the standard error.
+# Globals:
+#   None
+# Arguments:
+#   An error message, a string
+######################################################################
+error() {
+  echo "$*" >&2
+}
+
+######################################################################
 # Initialize global variables listed below which are used throughout
 # running all tests.
 # Globals:
@@ -410,6 +421,31 @@ _unittest_print_result() {
   fi
 }
 
+######################################################################
+# Return True if the string ends with the specified suffix, otherwise
+# return False.
+# Globals:
+#   None
+# Arguments:
+#   A word, a string.
+#   A suffix, a string.
+# Returns:
+#   0(True) if the word ends with the suffix.
+#   1(False) otherwise.
+######################################################################
+endswith() {
+  local word="${1:-}"
+  local suffix="${2:-}"
+
+  if [[ -z "$word" || -z "$suffix" ]]; then
+    error "Function \`endswith' requires two positional arguments."
+    return 1
+  fi
+
+  local regex="^.*${suffix}$"
+  [[ "$word" =~ $regex ]] || return 1
+  return 0
+}
 
 ######################################################################
 # Pluralize a word based on its count. When the count is omitted,

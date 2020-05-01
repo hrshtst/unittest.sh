@@ -353,10 +353,21 @@ testcase_print_result_skip() {
     " - should print the result for a skipped test case (skipped: this is skipped)" ]
 }
 
-testcase_num_collect_tests() {
-  it "should check number of collected test cases"
+testcase_endswith_return_0() {
+  it "should return 0 if the word ends with the suffix"
 
-  [ ${#_unittest_all_tests[@]} -eq 20 ]
+  endswith "angry" "y"
+  endswith "angry" "ry"
+  endswith "angry" "gry"
+}
+
+testcase_endswith_return_1() {
+  it "should return 1 if the word does not end with the suffix"
+
+  run endswith "angry" "x"
+  [ "$status" -eq 1 ]
+  run endswith "angry" "gryx"
+  [ "$status" -eq 1 ]
 }
 
 testcase_pluralize_regular() {
