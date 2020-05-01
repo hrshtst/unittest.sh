@@ -434,14 +434,13 @@ _unittest_print_result() {
 #   1(False) otherwise.
 ######################################################################
 endswith() {
-  local word="${1:-}"
-  local suffix="${2:-}"
-
-  if [[ -z "$word" || -z "$suffix" ]]; then
+  if (( $# != 2 )); then
     error "Function \`endswith' requires two positional arguments."
     return 1
   fi
 
+  local word="$1"
+  local suffix="$2"
   local regex="^.*${suffix}$"
   [[ "$word" =~ $regex ]] || return 1
   return 0
