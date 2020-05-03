@@ -67,6 +67,9 @@ testcase_initialize() {
   _unittest_passed_tests=("testcase_dummy")
   _unittest_failed_tests=("testcase_dummy")
   _unittest_skipped_tests=("testcase_dummy")
+  _unittest_flag_help=true
+  _unittest_flag_list=true
+  _unittest_flag_force=true
   # When the function is called,
   _unittest_initialize
   # Then they are initialized.
@@ -76,6 +79,9 @@ testcase_initialize() {
   [ ${#_unittest_passed_tests[@]} -eq 0 ]
   [ ${#_unittest_failed_tests[@]} -eq 0 ]
   [ ${#_unittest_skipped_tests[@]} -eq 0 ]
+  [ $_unittest_flag_help = false ]
+  [ $_unittest_flag_list = false ]
+  [ $_unittest_flag_force = false ]
 }
 
 testcase_reset_vars() {
@@ -337,7 +343,7 @@ testcase_print_result_fail() {
   _unittest_failed=false
   run _unittest_print_result_fail
   [ "${lines[0]}" = "$(tput setaf 1) ✗ should print the result for a failed test case$(tput sgr0)" ]
-  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line 336)" ]
+  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line 342)" ]
   [ "${lines[2]}" = "     \`false' failed with 1$(tput sgr0)" ]
 }
 
