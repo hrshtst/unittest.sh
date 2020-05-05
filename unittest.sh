@@ -337,7 +337,8 @@ _unittest_handle_skipped_test() {
 }
 
 ######################################################################
-# Shows the description of the current test case. If no description provided, just its function name will be shown.
+# Shows the description of the current test case. If no description
+# provided, just its function name will be shown.
 # Globals:
 #   _unittest_description
 # Arguments:
