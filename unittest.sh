@@ -649,6 +649,9 @@ run() {
   local cmd="$1"; shift
   local lineno="${BASH_LINENO[0]}"
   local source="${BASH_SOURCE[1]}"
+  status=0
+  output=
+  lines=()
   if ! command -v "$cmd" >/dev/null 2>&1; then
     printf >&2 "%s: line %d: %s: command not found\n"\
                "$source" "$lineno" "$cmd"
