@@ -42,6 +42,8 @@ testcase_copy_array_dict() {
 setup() {
   copy_array _unittest_all_tests reserved_all_tests
   # copy_array _unittest_tests_map reserved_tests_map
+  copy_array _unittest_specified_tests reserved_specified_tests
+  copy_array _unittest_running_tests reserved_running_tests
   copy_array _unittest_executed_tests reserved_executed_tests
   copy_array _unittest_passed_tests reserved_passed_tests
   copy_array _unittest_failed_tests reserved_failed_tests
@@ -51,6 +53,8 @@ setup() {
 teardown() {
   copy_array reserved_all_tests _unittest_all_tests
   # copy_array reserved_tests_map _unittest_tests_map
+  copy_array reserved_specified_tests _unittest_specified_tests
+  copy_array reserved_running_tests _unittest_running_tests
   copy_array reserved_executed_tests _unittest_executed_tests
   copy_array reserved_passed_tests _unittest_passed_tests
   copy_array reserved_failed_tests _unittest_failed_tests
