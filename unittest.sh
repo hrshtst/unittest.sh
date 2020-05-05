@@ -129,6 +129,12 @@ _unittest_all_tests=()
 # `unittest_collect_testcases` function
 declare -A _unittest_tests_map
 
+# An array which contains specified test cases by the user.
+_unittest_specified_tests=()
+
+# An array which contains function names to be running.
+_unittest_running_tests=()
+
 # An array which contains function names actually executed.
 _unittest_executed_tests=()
 
@@ -227,6 +233,8 @@ error() {
 # Globals:
 #   _unittest_all_tests
 #   _unittest_tests_map
+#   _unittest_specified_tests
+#   _unittest_running_tests
 #   _unittest_executed_tests
 #   _unittest_passed_tests
 #   _unittest_failed_tests
@@ -241,6 +249,8 @@ _unittest_initialize() {
   _unittest_all_tests=()
   # unset -v _unittest_tests_map
   # declare -A _unittest_tests_map
+  _unittest_specified_tests=()
+  _unittest_running_tests=()
   _unittest_executed_tests=()
   _unittest_passed_tests=()
   _unittest_failed_tests=()
@@ -549,7 +559,38 @@ EOT
 #   Command line arguments
 ######################################################################
 unittest_parse() {
-  unittest_help
+  local testspecs=()
+  local param=
+
+  while (( $# )); do
+    param="$1"
+    case "$param" in
+      -l|--list-tests)
+        _unittest_flag_list=true
+        shift
+        ;;
+      -f|--force-run)
+        _unittest_flag_force=true
+        shift
+        ;;
+      -h|--help)
+        _unittest_flag_help=true
+        shift
+        ;;
+      -*)
+        error "$0: unsupported option: $param"
+        return 1
+        shift
+        ;;
+      *)
+        testspecs+=("$param")
+        shift
+        ;;
+    esac
+  done
+
+  set -- "${testspecs[@]}"
+ _unittest_specified_tests=("${testspecs[@]}")
 }
 
 unittest_collect_testcases() {

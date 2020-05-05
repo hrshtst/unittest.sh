@@ -63,6 +63,8 @@ testcase_initialize() {
   # Given that fake values are assigned,
   _unittest_all_tests=("testcase_dummy")
   _unittest_tests_map=(["is a dummy test"]="testcase_dummy")
+  _unittest_specified_tests=("testcase_dummy")
+  _unittest_running_tests=("testcase_dummy")
   _unittest_executed_tests=("testcase_dummy")
   _unittest_passed_tests=("testcase_dummy")
   _unittest_failed_tests=("testcase_dummy")
@@ -75,6 +77,8 @@ testcase_initialize() {
   # Then they are initialized.
   [ ${#_unittest_all_tests[@]} -eq 0 ]
   # [ ${#_unittest_tests_map[@]} -eq 0 ]
+  [ ${#_unittest_specified_tests[@]} -eq 0 ]
+  [ ${#_unittest_running_tests[@]} -eq 0 ]
   [ ${#_unittest_executed_tests[@]} -eq 0 ]
   [ ${#_unittest_passed_tests[@]} -eq 0 ]
   [ ${#_unittest_failed_tests[@]} -eq 0 ]
@@ -343,7 +347,7 @@ testcase_print_result_fail() {
   _unittest_failed=false
   run _unittest_print_result_fail
   [ "${lines[0]}" = "$(tput setaf 1) ✗ should print the result for a failed test case$(tput sgr0)" ]
-  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line 342)" ]
+  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line 346)" ]
   [ "${lines[2]}" = "     \`false' failed with 1$(tput sgr0)" ]
 }
 
@@ -406,10 +410,74 @@ testcase_pluralize_ends_in_s() {
   [ "$(pluralize brass 2)" = "brasses" ]
 }
 
-testcase_num_collect_tests() {
-  it "should check number of collected test cases"
+_testcase_parse_flags_setup() {
+  _unittest_initialize
+  [ "$_unittest_flag_help" = false ]
+  [ "$_unittest_flag_list" = false ]
+  [ "$_unittest_flag_force" = false ]
+}
 
-  [ ${#_unittest_all_tests[@]} -eq 23 ]
+testcase_parse_flags_help() {
+  it "should set flags to show help message"
+
+  _testcase_parse_flags_setup
+  unittest_parse -h
+  [ "$_unittest_flag_help" = true ]
+
+  _testcase_parse_flags_setup
+  unittest_parse --help
+  [ "$_unittest_flag_help" = true ]
+}
+
+testcase_parse_flags_list() {
+  it "should set flags to list available tests"
+
+  _testcase_parse_flags_setup
+  unittest_parse -l
+  [ "$_unittest_flag_list" = true ]
+
+  _testcase_parse_flags_setup
+  unittest_parse --list-tests
+  [ "$_unittest_flag_list" = true ]
+}
+
+testcase_parse_flags_force() {
+  it "should set flags to force to run skipping tests"
+
+  _testcase_parse_flags_setup
+  unittest_parse -f
+  [ "$_unittest_flag_force" = true ]
+
+  _testcase_parse_flags_setup
+  unittest_parse --force-run
+  [ "$_unittest_flag_force" = true ]
+}
+
+testcase_parse_flags_unsupported() {
+  it "should throw an error if unsupported option is supplied"
+
+  _testcase_parse_flags_setup
+  run unittest_parse -a
+  [ "$status" -eq 1 ]
+  [ "$output" = "$0: unsupported option: -a" ]
+
+  _testcase_parse_flags_setup
+  run unittest_parse --unknown
+  [ "$status" -eq 1 ]
+  [ "$output" = "$0: unsupported option: --unknown" ]
+}
+
+testcase_parse_flags_positional_args() {
+  it "should store positional arguments to a variable"
+
+  unittest_parse "should test something" "should check an awesome thing"
+  [ "${_unittest_specified_tests[0]}" = "should test something" ]
+  [ "${_unittest_specified_tests[1]}" = "should check an awesome thing" ]
+
+  unittest_parse -f "test 01" "test 02"
+  [ "$_unittest_flag_force" = true ]
+  [ "${_unittest_specified_tests[0]}" = "test 01" ]
+  [ "${_unittest_specified_tests[1]}" = "test 02" ]
 }
 
 unittest_run "$@"
