@@ -487,4 +487,15 @@ testcase_parse_flags_positional_args() {
   [ "${_unittest_specified_tests[1]}" = "test 02" ]
 }
 
+testcase_collect_testcases() {
+  it "should collect testcases and store them in a variable"
+
+  local n_testcases
+  n_testcases="$(grep -e "^testcase_.*() {$" "$0" | wc -l)"
+
+  _unittest_all_tests=()
+  _unittest_collect_testcases
+  [ "${#_unittest_all_tests[@]}" = "$n_testcases" ]
+}
+
 unittest_run "$@"

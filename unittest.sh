@@ -314,6 +314,22 @@ _unittest_reset_vars() {
 }
 
 ######################################################################
+# Collect functions whose names begin with `testcase_` and put then
+# into the global variable `_unittest_all_tests`.
+# Globals:
+#   _unittest_all_tests
+# Arguments:
+#   None
+######################################################################
+_unittest_collect_testcases() {
+  local regex_tests="^testcase_.*"
+
+  while IFS= read -r func; do
+    _unittest_all_tests+=("$func")
+  done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_tests")
+}
+
+######################################################################
 # To achieve the skip functionality, skim the current test case and
 # add a statement `return 0` shortly following the `skip` command if
 # it exisis.
@@ -594,13 +610,16 @@ unittest_parse() {
  _unittest_specified_tests=("${testspecs[@]}")
 }
 
-unittest_collect_testcases() {
-  local regex_tests
-  regex_tests="^testcase_.*"
+# unittest_collect_testcases() {
+#   local regex_tests
+#   regex_tests="^testcase_.*"
 
-  while IFS= read -r func; do
-    _unittest_all_tests+=("$func")
-  done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_tests")
+#   while IFS= read -r func; do
+#     _unittest_all_tests+=("$func")
+#   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_tests")
+# }
+unittest_determine_running_testcases() {
+  _unittest_collect_testcases
 }
 
 unittest_run_testcases() {
@@ -732,7 +751,7 @@ skip() {
 ######################################################################
 unittest_run() {
   unittest_setup
-  unittest_collect_testcases
+  unittest_determine_running_testcases
   unittest_run_testcases
   unittest_print_summary
 }
