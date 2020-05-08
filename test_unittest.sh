@@ -43,7 +43,7 @@ setup() {
   copy_array _unittest_all_tests reserved_all_tests
   copy_array _unittest_all_tests_map reserved_all_tests_map
   copy_array _unittest_specified_tests reserved_specified_tests
-  copy_array _unittest_running_tests reserved_running_tests
+  copy_array _unittest_tests_to_run reserved_running_tests
   copy_array _unittest_executed_tests reserved_executed_tests
   copy_array _unittest_passed_tests reserved_passed_tests
   copy_array _unittest_failed_tests reserved_failed_tests
@@ -54,7 +54,7 @@ teardown() {
   copy_array reserved_all_tests _unittest_all_tests
   copy_array reserved_all_tests_map _unittest_all_tests_map
   copy_array reserved_specified_tests _unittest_specified_tests
-  copy_array reserved_running_tests _unittest_running_tests
+  copy_array reserved_running_tests _unittest_tests_to_run
   copy_array reserved_executed_tests _unittest_executed_tests
   copy_array reserved_passed_tests _unittest_passed_tests
   copy_array reserved_failed_tests _unittest_failed_tests
@@ -68,7 +68,7 @@ testcase_initialize() {
   _unittest_all_tests=("testcase_dummy")
   _unittest_all_tests_map=(["is a dummy test"]="testcase_dummy")
   _unittest_specified_tests=("testcase_dummy")
-  _unittest_running_tests=("testcase_dummy")
+  _unittest_tests_to_run=("testcase_dummy")
   _unittest_executed_tests=("testcase_dummy")
   _unittest_passed_tests=("testcase_dummy")
   _unittest_failed_tests=("testcase_dummy")
@@ -82,7 +82,7 @@ testcase_initialize() {
   [ ${#_unittest_all_tests[@]} -eq 0 ]
   [ ${_unittest_all_tests_map[@]-isunset} = isunset ]
   [ ${#_unittest_specified_tests[@]} -eq 0 ]
-  [ ${#_unittest_running_tests[@]} -eq 0 ]
+  [ ${#_unittest_tests_to_run[@]} -eq 0 ]
   [ ${#_unittest_executed_tests[@]} -eq 0 ]
   [ ${#_unittest_passed_tests[@]} -eq 0 ]
   [ ${#_unittest_failed_tests[@]} -eq 0 ]

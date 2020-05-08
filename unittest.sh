@@ -131,8 +131,8 @@ declare -A _unittest_all_tests_map
 # An array which contains specified test cases by the user.
 _unittest_specified_tests=()
 
-# An array which contains function names to be running.
-_unittest_running_tests=()
+# An array which contains function names to run.
+_unittest_tests_to_run=()
 
 # An array which contains function names actually executed.
 _unittest_executed_tests=()
@@ -233,7 +233,7 @@ error() {
 #   _unittest_all_tests
 #   _unittest_all_tests_map
 #   _unittest_specified_tests
-#   _unittest_running_tests
+#   _unittest_tests_to_run
 #   _unittest_executed_tests
 #   _unittest_passed_tests
 #   _unittest_failed_tests
@@ -249,7 +249,7 @@ _unittest_initialize() {
   unset -v _unittest_all_tests_map
   declare -Ag _unittest_all_tests_map
   _unittest_specified_tests=()
-  _unittest_running_tests=()
+  _unittest_tests_to_run=()
   _unittest_executed_tests=()
   _unittest_passed_tests=()
   _unittest_failed_tests=()
