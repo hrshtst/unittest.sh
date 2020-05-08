@@ -423,8 +423,10 @@ _unittest_preprocesses() {
   _unittest_testcase="$1"
   # reset variables
   _unittest_reset_vars
-  # handle a skipped test
-  _unittest_handle_skipped_test "$_unittest_testcase"
+  if [[ "$_unittest_flag_force" = false ]]; then
+    # handle a skipped test
+    _unittest_handle_skipped_test "$_unittest_testcase"
+  fi
 }
 
 ######################################################################
@@ -794,6 +796,8 @@ run() {
 #   Reason for skipping, string (optional)
 ######################################################################
 skip() {
+  [[ "$_unittest_flag_force" = true ]] && return
+
   _unittest_skip_note="${1:-}"
   _unittest_skipped=true
 }
