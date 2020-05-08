@@ -125,9 +125,8 @@ _unittest_working_directory="$(pwd)"
 _unittest_all_tests=()
 
 # An associative array which contains test case functions as values
-# indexed by descriptions of the test. It is built by the
-# `unittest_collect_testcases` function
-declare -A _unittest_tests_map
+# indexed by descriptions of it.
+declare -A _unittest_all_tests_map
 
 # An array which contains specified test cases by the user.
 _unittest_specified_tests=()
@@ -232,7 +231,7 @@ error() {
 # running all tests.
 # Globals:
 #   _unittest_all_tests
-#   _unittest_tests_map
+#   _unittest_all_tests_map
 #   _unittest_specified_tests
 #   _unittest_running_tests
 #   _unittest_executed_tests
@@ -247,8 +246,8 @@ error() {
 ######################################################################
 _unittest_initialize() {
   _unittest_all_tests=()
-  # unset -v _unittest_tests_map
-  # declare -A _unittest_tests_map
+  unset -v _unittest_all_tests_map
+  declare -Ag _unittest_all_tests_map
   _unittest_specified_tests=()
   _unittest_running_tests=()
   _unittest_executed_tests=()
@@ -314,19 +313,61 @@ _unittest_reset_vars() {
 }
 
 ######################################################################
-# Collect functions whose names begin with `testcase_` and put then
-# into the global variable `_unittest_all_tests`.
+# Extract a description from a definition of a test case function. If
+# no description is provided or it is invalid, returns its test case
+# function name.
+# Globals:
+#   None
+# Arguments:
+#   A test case function, a string.
+# Outputs:
+#   A string which is provided as a description or the function name
+#   to the standard output.
+######################################################################
+_unittest_extract_description() {
+  local _func="$1"
+  local regex_find_it="^[[:space:]]\+it.*"
+  local sed_remove_quote="s/[\"';]//g"
+  local sed_find_desc="s/^[[:space:]]\+it \(.*\)/\1/p"
+  local _line=
+  local _desc=
+
+  # Find lines which contains `it` at the beginning.
+  _line="$(declare -f "$_func" | grep -e "$regex_find_it")"
+  # Choose only the last one.
+  _line="$(echo "$_line" | tail -1)"
+  # Extract the description
+  _desc="$(echo "$_line" | sed -e "$sed_remove_quote" | sed -n "$sed_find_desc")"
+
+  # Output to the standard output.
+  if [[ -n "$_desc" ]]; then
+    echo "$_desc"
+  else
+    echo "$_func"
+  fi
+}
+
+######################################################################
+# Collects functions whose names begin with `testcase_` and put them
+# into a global variable `_unittest_all_tests`. In parallel, it makes
+# an associative array, `_unittest_all_tests_map`, which contains
+# function names as values indexed with their descriptions as keys.
 # Globals:
 #   _unittest_all_tests
+#   _unittest_all_tests_map
 # Arguments:
 #   None
 ######################################################################
 _unittest_collect_testcases() {
-  local regex_tests="^testcase_.*"
+  local regex_find_testcase="^testcase_.*"
+  local _func=
+  local _desc=
 
-  while IFS= read -r func; do
-    _unittest_all_tests+=("$func")
-  done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_tests")
+  while IFS= read -r _func; do
+    _desc="$(_unittest_extract_description "$_func")"
+    _unittest_all_tests+=("$_func")
+    _unittest_all_tests_map["$_desc"]="$_func"
+  done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_find_testcase")
 }
 
 ######################################################################
@@ -610,15 +651,14 @@ unittest_parse() {
  _unittest_specified_tests=("${testspecs[@]}")
 }
 
-# unittest_collect_testcases() {
-#   local regex_tests
-#   regex_tests="^testcase_.*"
-
-#   while IFS= read -r func; do
-#     _unittest_all_tests+=("$func")
-#   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_tests")
-# }
-unittest_determine_running_testcases() {
+######################################################################
+# Decide which testcases should be run.
+# Globals:
+#   None
+# Arguments:
+#   None
+######################################################################
+unittest_decide_testcases() {
   _unittest_collect_testcases
 }
 
@@ -751,7 +791,7 @@ skip() {
 ######################################################################
 unittest_run() {
   unittest_setup
-  unittest_determine_running_testcases
+  unittest_decide_testcases
   unittest_run_testcases
   unittest_print_summary
 }
