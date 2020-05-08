@@ -610,6 +610,24 @@ EOT
 }
 
 ######################################################################
+# Show the list of available tests.
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   List of available tests to stdout.
+######################################################################
+unittest_list_tests() {
+  local _func=
+  local _desc=
+  for _desc in "${!_unittest_all_tests_map[@]}"; do
+    _func="${_unittest_all_tests_map[$_desc]}"
+    printf "%s: %s\n" "$_func" "$_desc"
+  done
+}
+
+######################################################################
 # Parse command line arguments.
 # Globals:
 #   None
@@ -787,10 +805,19 @@ skip() {
 # Globals:
 #   None
 # Arguments:
-#   None
+#   Command arguments.
 ######################################################################
 unittest_run() {
   unittest_setup
+  unittest_parse "$@"
+  if [[ "$_unittest_flag_help" = true ]]; then
+    unittest_help
+    return 0
+  elif [[ "$_unittest_flag_list" = true ]]; then
+    _unittest_collect_testcases
+    unittest_list_tests
+    return 0
+  fi
   unittest_decide_testcases
   unittest_run_testcases
   unittest_print_summary
