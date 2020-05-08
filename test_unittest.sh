@@ -237,7 +237,7 @@ testcase_it() {
   [ "$(_unittest_describe)" = "$_desc" ]
 
   it
-  [ "$(_unittest_describe)" = "anonymous test" ]
+  [ "$(_unittest_describe)" = "testcase_it" ]
 
   it should store the description of the test case
   [ "$(_unittest_describe)" = "$_desc" ]
