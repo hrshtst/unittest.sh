@@ -94,11 +94,11 @@ are executed before and after each test case, respectively.
 ### Running tests
 
 To run the tests and show the results on the console, it is needed to
-put `unittest_run` command at the end of the script. The order to
+put `unittest_main` command at the end of the script. The order to
 execute tests is sorted alphabetically.
 
 ``` shell
-unittest_run "$@"
+unittest_main "$@"
 ```
 
 The test script can be executed like as a bash script. The results are

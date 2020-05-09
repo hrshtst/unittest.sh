@@ -42,7 +42,7 @@
 #   false
 # }
 #
-# unittest_run "$@"
+# unittest_main "$@"
 # ..
 #
 # Let's say the example script is saved as `test_example.sh`. Execute
@@ -81,7 +81,7 @@
 # Additionally, `setup` and `teardown` functions can be defined, which
 # are executed before and after each test case, respectively.
 #
-# Finally, a `unittest_run` command should be put with command line
+# Finally, a `unittest_main` command should be put with command line
 # arguments to run all test cases and show results.
 #
 # Output format of the result and ideas of `run` and `skip` commands
@@ -811,7 +811,7 @@ skip() {
 # Arguments:
 #   Command arguments.
 ######################################################################
-unittest_run() {
+unittest_main() {
   unittest_setup
   unittest_parse "$@"
   if [[ "$_unittest_flag_help" = true ]]; then

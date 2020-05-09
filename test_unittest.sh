@@ -538,4 +538,4 @@ testcase_collect_testcases_check_map() {
   [ "${_unittest_all_tests_map[$key]}" = "$key" ]
 }
 
-unittest_run "$@"
+unittest_main "$@"

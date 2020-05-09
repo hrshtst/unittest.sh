@@ -36,4 +36,4 @@ testcase_fail() {
   false
 }
 
-unittest_run "$@"
+unittest_main "$@"
