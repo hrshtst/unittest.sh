@@ -147,6 +147,18 @@ _unittest_failed_tests=()
 _unittest_skipped_tests=()
 
 
+### Flags to control behavior based on the command line arguments.
+
+# Flag to show help message and exit.
+_unittest_flag_help=false
+
+# Flag to show the list available tests and exit.
+_unittest_flag_list=false
+
+# Flag to run skipping test forcely.
+_unittest_flag_force=false
+
+
 ### Global variables cleared or initialized prior to running each test
 ### case.
 
@@ -199,18 +211,6 @@ output=
 # `$output` variable.
 export lines
 lines=()
-
-
-### Flags to control behavior based on the command line arguments.
-
-# Flag to show help message and exit.
-_unittest_flag_help=false
-
-# Flag to show the list available tests and exit.
-_unittest_flag_list=false
-
-# Flag to run skipping test forcely.
-_unittest_flag_force=false
 
 
 ### Internal helper functions
