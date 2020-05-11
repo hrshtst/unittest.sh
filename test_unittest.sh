@@ -7,6 +7,9 @@
 # shellcheck source=unittest.sh
 source unittest.sh
 
+
+### Testing of methods used in this script privately.
+
 # The `copy_array` function takes two variable names as arguments. The
 # first argument is the source variable to be copied, and the second
 # one is the destination to be newly created. The destination variable
@@ -61,11 +64,21 @@ testcase_copy_associative_array() {
   [ "${array1[key3]}" = "${array2[key3]}" ]
 }
 
+
+### Testing of methods in `unittest.sh`.
+
+# The unit testing framework `unittest.sh` uses global variables whose
+# prefixes commonly starts with `_unittest`. Since this script aims to
+# test methods in `unittest.sh` under the control of `unittest.sh`
+# itself, either modifying or resetting the variables may cause a
+# break of the testing framework. To prevent from going out of order,
+# each global varialbe is stored in another prior to running each test
+# case, and restore it to the original.
 setup() {
   copy_array _unittest_all_tests reserved_all_tests
   copy_array _unittest_all_descriptions reserved_all_descriptions
   copy_array _unittest_specified_tests reserved_specified_tests
-  copy_array _unittest_tests_to_run reserved_running_tests
+  copy_array _unittest_tests_to_run reserved_tests_to_run
   copy_array _unittest_executed_tests reserved_executed_tests
   copy_array _unittest_passed_tests reserved_passed_tests
   copy_array _unittest_failed_tests reserved_failed_tests
@@ -76,7 +89,7 @@ teardown() {
   copy_array reserved_all_tests _unittest_all_tests
   copy_array reserved_all_descriptions _unittest_all_descriptions
   copy_array reserved_specified_tests _unittest_specified_tests
-  copy_array reserved_running_tests _unittest_tests_to_run
+  copy_array reserved_tests_to_run _unittest_tests_to_run
   copy_array reserved_executed_tests _unittest_executed_tests
   copy_array reserved_passed_tests _unittest_passed_tests
   copy_array reserved_failed_tests _unittest_failed_tests
