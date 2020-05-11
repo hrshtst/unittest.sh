@@ -365,7 +365,7 @@ _unittest_collect_testcases() {
   while IFS= read -r _func; do
     _desc="$(_unittest_extract_description "$_func")"
     _unittest_all_tests+=("$_func")
-    _unittest_all_descriptions+=("")
+    _unittest_all_descriptions+=("$_desc")
   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_find_testcase")
 }
 
@@ -620,12 +620,15 @@ EOT
 #   List of available tests to stdout.
 ######################################################################
 unittest_list_tests() {
-  local _func=
-  local _desc=
-  # for _desc in "${!_unittest_all_tests_map[@]}"; do
-  #   _func="${_unittest_all_tests_map[$_desc]}"
-  #   printf "%s: %s\n" "$_func" "$_desc"
-  # done
+  local index=
+  local func=
+  local desc=
+  printf "%d tests found\n" "${#_unittest_all_tests[@]}"
+  for index in "${!_unittest_all_tests[@]}"; do
+    func="${_unittest_all_tests[$index]}"
+    desc="${_unittest_all_descriptions[$index]}"
+    printf "%2d: %s: %s\n" "$index" "$func" "$desc"
+  done
 }
 
 ######################################################################
