@@ -7,36 +7,58 @@
 # shellcheck source=unittest.sh
 source unittest.sh
 
+# The `copy_array` function takes two variable names as arguments. The
+# first argument is the source variable to be copied, and the second
+# one is the destination to be newly created. The destination variable
+# will be declared as the same type as the source. This function is
+# used only in this script, so it is not related with unittest.sh.
+# Note that this function always declares the destination variable as
+# a global one.
 copy_array() {
   local src="$1"
   local dst="$2"
-  local src_repr="$(declare -p $src)"
-  local src_elem="${src_repr#*=}"
-  local src_type="${src_repr:9:1}"
+  (( $# == 2 )) || return 1
 
-  eval "declare -${src_type}g $dst="$src_elem
+  local repr
+  local elem
+  local type
+  repr="$(declare -p "$src")"
+      # => declare -a src=([0]="value1" [1]="value2" [2]="value3")
+  elem="${repr#*=}" # => ([0]="value1" [1]="value2" [2]="value3")
+  type="$(echo "$repr" | cut -d' ' -f2)" # => -a
+
+  # Unset a variable in case the variable name conflicts
+  unset -v $dst
+
+  # NOTE: $dst is declared as a global variable to make it visible
+  # outside from this function.
+  eval "declare ${type}g $dst=$elem"
 }
 
-testcase_copy_array_list() {
-  it "should copy elements of a list array to another variable"
+testcase_copy_array() {
+  it "copy_array" "should copy elements of an array to another"
 
-  list1=("value1" "value2" "value3")
-  copy_array list1 list2
-  [ ${#list1[@]} -eq ${#list2[@]} ]
-  [ "${list1[0]}" = "${list2[0]}" ]
-  [ "${list1[1]}" = "${list2[1]}" ]
-  [ "${list1[2]}" = "${list2[2]}" ]
+  local array1
+  array1=([0]="value1" [1]="value2" [2]="value3")
+  array2=()
+  copy_array array1 array2
+  [ ${#array1[@]} -eq ${#array2[@]} ]
+  [ "${array1[0]}" = "${array2[0]}" ]
+  [ "${array1[1]}" = "${array2[1]}" ]
+  [ "${array1[2]}" = "${array2[2]}" ]
 }
 
-testcase_copy_array_dict() {
-  it "should copy elements of an associative array to another variable"
+testcase_copy_associative_array() {
+  it "copy_array" "should copy elements of an associative array to another"
 
-  declare -A dict1=(["key1"]="value1" ["key2"]="value2" ["key3"]="value3")
-  copy_array dict1 dict2
-  [ ${#dict1[@]} -eq ${#dict2[@]} ]
-  [ "${dict1[key1]}" = "${dict2[key1]}" ]
-  [ "${dict1[key2]}" = "${dict2[key2]}" ]
-  [ "${dict1[key3]}" = "${dict2[key3]}" ]
+  declare -A array1
+  array1=(["key1"]="value1" ["key2"]="value2" ["key3"]="value3")
+  array2=()
+  copy_array array1 array2
+  [ ${#array1[@]} -eq ${#array2[@]} ]
+  [ "${array1[key1]}" = "${array2[key1]}" ]
+  [ "${array1[key2]}" = "${array2[key2]}" ]
+  [ "${array1[key3]}" = "${array2[key3]}" ]
 }
 
 setup() {
