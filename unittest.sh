@@ -365,7 +365,7 @@ _unittest_collect_testcases() {
   while IFS= read -r _func; do
     _desc="$(_unittest_extract_description "$_func")"
     _unittest_all_tests+=("$_func")
-    # _unittest_all_tests_map["$_desc"]="$_func"
+    _unittest_all_descriptions+=("")
   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_find_testcase")
 }
 

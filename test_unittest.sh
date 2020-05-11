@@ -494,7 +494,7 @@ testcase_collect_testcases_check_num() {
   n_testcases="$(grep -e "^testcase_.*() {$" "$0" | wc -l)"
 
   [ "${#_unittest_all_tests[@]}" = "$n_testcases" ]
-  # [ "${#_unittest_all_descriptions[@]}" = "$n_testcases" ]
+  [ "${#_unittest_all_descriptions[@]}" = "$n_testcases" ]
 }
 
 testcase_collect_testcases_dummy01() {
