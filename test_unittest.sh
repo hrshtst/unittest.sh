@@ -41,7 +41,7 @@ testcase_copy_array_dict() {
 
 setup() {
   copy_array _unittest_all_tests reserved_all_tests
-  copy_array _unittest_all_tests_map reserved_all_tests_map
+  copy_array _unittest_all_descriptions reserved_all_descriptions
   copy_array _unittest_specified_tests reserved_specified_tests
   copy_array _unittest_tests_to_run reserved_running_tests
   copy_array _unittest_executed_tests reserved_executed_tests
@@ -52,7 +52,7 @@ setup() {
 
 teardown() {
   copy_array reserved_all_tests _unittest_all_tests
-  copy_array reserved_all_tests_map _unittest_all_tests_map
+  copy_array reserved_all_descriptions _unittest_all_descriptions
   copy_array reserved_specified_tests _unittest_specified_tests
   copy_array reserved_running_tests _unittest_tests_to_run
   copy_array reserved_executed_tests _unittest_executed_tests
@@ -66,7 +66,7 @@ testcase_initialize() {
 
   # Given that fake values are assigned,
   _unittest_all_tests=("testcase_dummy")
-  _unittest_all_tests_map=(["is a dummy test"]="testcase_dummy")
+  _unittest_all_descriptions=("this is a dummy test")
   _unittest_specified_tests=("testcase_dummy")
   _unittest_tests_to_run=("testcase_dummy")
   _unittest_executed_tests=("testcase_dummy")
@@ -80,7 +80,7 @@ testcase_initialize() {
   _unittest_initialize
   # Then they are initialized.
   [ ${#_unittest_all_tests[@]} -eq 0 ]
-  [ ${_unittest_all_tests_map[@]-isunset} = isunset ]
+  [ ${#_unittest_all_descriptions[@]} -eq 0 ]
   [ ${#_unittest_specified_tests[@]} -eq 0 ]
   [ ${#_unittest_tests_to_run[@]} -eq 0 ]
   [ ${#_unittest_executed_tests[@]} -eq 0 ]
@@ -494,7 +494,7 @@ testcase_collect_testcases_check_num() {
   n_testcases="$(grep -e "^testcase_.*() {$" "$0" | wc -l)"
 
   [ "${#_unittest_all_tests[@]}" = "$n_testcases" ]
-  [ "${#_unittest_all_tests_map[@]}" = "$n_testcases" ]
+  # [ "${#_unittest_all_descriptions[@]}" = "$n_testcases" ]
 }
 
 testcase_collect_testcases_dummy01() {
@@ -518,24 +518,24 @@ testcase_collect_testcases_dummy05() {
   :
 }
 
-testcase_collect_testcases_check_map() {
-  it "should check if the created map stores keys and values correctly"
+# testcase_collect_testcases_check_map() {
+#   it "should check if the created map stores keys and values correctly"
 
-  local key="this is a dummy test"
-  [ "${_unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy01" ]
+#   local key="this is a dummy test"
+#   [ "${_unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy01" ]
 
-  key='this is a dummy test which has a so so so so loooooooooong description that it does not fit into one line'
-  [ "${_unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy02" ]
+#   key='this is a dummy test which has a so so so so loooooooooong description that it does not fit into one line'
+#   [ "${_unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy02" ]
 
-  # When no description is provided, the key should be its function name
-  key="testcase_collect_testcases_dummy03"
-  [ "${_unittest_all_tests_map[$key]}" = "$key" ]
+#   # When no description is provided, the key should be its function name
+#   key="testcase_collect_testcases_dummy03"
+#   [ "${_unittest_all_tests_map[$key]}" = "$key" ]
 
-  key="testcase_collect_testcases_dummy04"
-  [ "${_unittest_all_tests_map[$key]}" = "$key" ]
+#   key="testcase_collect_testcases_dummy04"
+#   [ "${_unittest_all_tests_map[$key]}" = "$key" ]
 
-  key="testcase_collect_testcases_dummy05"
-  [ "${_unittest_all_tests_map[$key]}" = "$key" ]
-}
+#   key="testcase_collect_testcases_dummy05"
+#   [ "${_unittest_all_tests_map[$key]}" = "$key" ]
+# }
 
 unittest_main "$@"

@@ -124,9 +124,9 @@ _unittest_working_directory="$(pwd)"
 # script. It is built by the `unittest_collect_testcases` function.
 _unittest_all_tests=()
 
-# An associative array which contains test case functions as values
-# indexed by descriptions of it.
-declare -A _unittest_all_tests_map
+# An array which contains all the descriptions provided by the user
+# for the test cases.
+_unittest_all_descriptions=()
 
 # An array which contains specified test cases by the user.
 _unittest_specified_tests=()
@@ -231,7 +231,7 @@ error() {
 # running all tests.
 # Globals:
 #   _unittest_all_tests
-#   _unittest_all_tests_map
+#   _unittest_all_descriptions
 #   _unittest_specified_tests
 #   _unittest_tests_to_run
 #   _unittest_executed_tests
@@ -246,8 +246,7 @@ error() {
 ######################################################################
 _unittest_initialize() {
   _unittest_all_tests=()
-  unset -v _unittest_all_tests_map
-  declare -Ag _unittest_all_tests_map
+  _unittest_all_descriptions=()
   _unittest_specified_tests=()
   _unittest_tests_to_run=()
   _unittest_executed_tests=()
@@ -348,13 +347,13 @@ _unittest_extract_description() {
 }
 
 ######################################################################
-# Collects functions whose names begin with `testcase_` and put them
-# into a global variable `_unittest_all_tests`. In parallel, it makes
-# an associative array, `_unittest_all_tests_map`, which contains
-# function names as values indexed with their descriptions as keys.
+# Collects functions whose names begin with `testcase_` and their
+# descriptions provided by the user. Function names and descriptions
+# are stored in global variables `_unittest_all_tests` and
+# `_unittest_all_descriptions`, respectively.
 # Globals:
 #   _unittest_all_tests
-#   _unittest_all_tests_map
+#   _unittest_all_descriptions
 # Arguments:
 #   None
 ######################################################################
@@ -366,7 +365,7 @@ _unittest_collect_testcases() {
   while IFS= read -r _func; do
     _desc="$(_unittest_extract_description "$_func")"
     _unittest_all_tests+=("$_func")
-    _unittest_all_tests_map["$_desc"]="$_func"
+    # _unittest_all_tests_map["$_desc"]="$_func"
   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_find_testcase")
 }
 
@@ -623,10 +622,10 @@ EOT
 unittest_list_tests() {
   local _func=
   local _desc=
-  for _desc in "${!_unittest_all_tests_map[@]}"; do
-    _func="${_unittest_all_tests_map[$_desc]}"
-    printf "%s: %s\n" "$_func" "$_desc"
-  done
+  # for _desc in "${!_unittest_all_tests_map[@]}"; do
+  #   _func="${_unittest_all_tests_map[$_desc]}"
+  #   printf "%s: %s\n" "$_func" "$_desc"
+  # done
 }
 
 ######################################################################
