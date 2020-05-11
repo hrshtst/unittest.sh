@@ -347,6 +347,32 @@ _unittest_extract_description() {
 }
 
 ######################################################################
+# Return the index of the array `_unittest_all_descriptions` whose
+# value is the supplied description.
+# Globals:
+#   _unittest_all_descriptions
+# Arguments:
+#   Description of a test case, a string.
+# Outputs:
+#   The index or a null character to the standard output.
+######################################################################
+_unittest_get_index_from_description() {
+  if (( $# == 0 )); then
+    error "No descriptions provided"
+  fi
+
+  local desc="$1"
+  local index=
+  local found=false
+  for index in "${!_unittest_all_descriptions[@]}"; do
+    if [[ "$desc" == "${_unittest_all_descriptions[$index]}" ]]; then
+      found=true
+    fi
+  done
+  [[ "$found" == true  ]] && echo "$index"
+}
+
+######################################################################
 # Collects functions whose names begin with `testcase_` and their
 # descriptions provided by the user. Function names and descriptions
 # are stored in global variables `_unittest_all_tests` and
