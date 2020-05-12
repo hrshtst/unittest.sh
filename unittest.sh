@@ -3,11 +3,11 @@
 # unittest.sh
 #
 # This script provides a micro unit testing framework for bash shell
-# scripts. Each test case consists of a short description of it and
-# shell commands to be tested. Note that this framework does not
-# provide any assertion command. Instead, it harnesses a trap on `ERR`
-# signal, which enabled with the `errtrace` option by the `set`
-# command provided by bash. If every command in a test case exits with
+# scripts. Each test case consists of a short description and shell
+# commands to be tested. Note that this framework does not provide any
+# assertion command like `assertEqual`. Instead, it harnesses a trap
+# on `ERR` signal, which enabled with the `errtrace` option by the
+# `set` built-in command. If every command in a test case exits with
 # the `0` status code, it means that the test passes.
 #
 # The following code is an example usage of this framework.
@@ -18,27 +18,27 @@
 # source unittest.sh
 #
 # testcase_add() {
-#   describe "adds numbers using bc"
+#   describe "adding numbers using bc"
 #   result="$(echo 2+2 | bc)"
 #   [ "$result" -eq 4 ]
 # }
 #
 # testcase_run() {
-#   describe "gets the word 'bar' with cut command"
+#   describe "getting the word 'bar' with cut command"
 #   run echo 'foo bar baz' | cut -d' ' -f2
 #   [ "$status" -eq 0 ]
 #   [ "$output" = "bar" ]
 # }
 #
 # testcase_skip() {
-#   describe "is skipped"
+#   describe "skip test"
 #   skip "foo command returns 0 but not now"
 #   run foo
 #   [ "$status" -eq 0 ]
 # }
 #
 # testcase_fail() {
-#   describe "always fails"
+#   describe "this always fails"
 #   false
 # }
 #
@@ -84,9 +84,9 @@
 # Finally, a `unittest_main` command should be put with command line
 # arguments to run all test cases and show results.
 #
-# Output format of the result and ideas of `run` and `skip` commands
-# and `$status` and `$output` variables and so on are adopted from the
-# Bash Automated Testing System (a.k.a BATS), which is hosted on
+# Output format of the results, ideas of `run` and `skip` commands and
+# `$status` and `$output` variables, etc. are adopted from the Bash
+# Automated Testing System (a.k.a BATS), which is hosted on
 # [https://github.com/sstephenson/bats] by Sam Stephenson and
 # currently-maintained version on
 # [https://github.com/bats-core/bats-core] by bats-core contributors.
