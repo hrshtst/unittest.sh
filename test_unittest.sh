@@ -68,95 +68,95 @@ testcase_copy_associative_array() {
 ### Testing of methods in `unittest.sh`.
 
 # The unit testing framework `unittest.sh` uses global variables whose
-# prefixes commonly starts with `_unittest`. Since this script aims to
+# prefixes commonly starts with `unittest`. Since this script aims to
 # test methods in `unittest.sh` under the control of `unittest.sh`
 # itself, either modifying or resetting the variables may cause a
 # break of the testing framework. To prevent from going out of order,
 # each global varialbe is stored in another prior to running each test
 # case, and restore it to the original.
 setup() {
-  copy_array _unittest_all_tests reserved_all_tests
-  copy_array _unittest_all_descriptions reserved_all_descriptions
-  copy_array _unittest_specified_tests reserved_specified_tests
-  copy_array _unittest_tests_to_run reserved_tests_to_run
-  copy_array _unittest_executed_tests reserved_executed_tests
-  copy_array _unittest_passed_tests reserved_passed_tests
-  copy_array _unittest_failed_tests reserved_failed_tests
-  copy_array _unittest_skipped_tests reserved_skipped_tests
+  copy_array unittest_all_tests reserved_all_tests
+  copy_array unittest_all_descriptions reserved_all_descriptions
+  copy_array unittest_specified_tests reserved_specified_tests
+  copy_array unittest_tests_to_run reserved_tests_to_run
+  copy_array unittest_executed_tests reserved_executed_tests
+  copy_array unittest_passed_tests reserved_passed_tests
+  copy_array unittest_failed_tests reserved_failed_tests
+  copy_array unittest_skipped_tests reserved_skipped_tests
 }
 
 teardown() {
-  copy_array reserved_all_tests _unittest_all_tests
-  copy_array reserved_all_descriptions _unittest_all_descriptions
-  copy_array reserved_specified_tests _unittest_specified_tests
-  copy_array reserved_tests_to_run _unittest_tests_to_run
-  copy_array reserved_executed_tests _unittest_executed_tests
-  copy_array reserved_passed_tests _unittest_passed_tests
-  copy_array reserved_failed_tests _unittest_failed_tests
-  copy_array reserved_skipped_tests _unittest_skipped_tests
+  copy_array reserved_all_tests unittest_all_tests
+  copy_array reserved_all_descriptions unittest_all_descriptions
+  copy_array reserved_specified_tests unittest_specified_tests
+  copy_array reserved_tests_to_run unittest_tests_to_run
+  copy_array reserved_executed_tests unittest_executed_tests
+  copy_array reserved_passed_tests unittest_passed_tests
+  copy_array reserved_failed_tests unittest_failed_tests
+  copy_array reserved_skipped_tests unittest_skipped_tests
 }
 
 testcase_initialize() {
   it "should initialize variables used throughout running tests"
 
   # Given that fake values are assigned,
-  _unittest_all_tests=("testcase_dummy")
-  _unittest_all_descriptions=("this is a dummy test")
-  _unittest_specified_tests=("testcase_dummy")
-  _unittest_tests_to_run=("testcase_dummy")
-  _unittest_executed_tests=("testcase_dummy")
-  _unittest_passed_tests=("testcase_dummy")
-  _unittest_failed_tests=("testcase_dummy")
-  _unittest_skipped_tests=("testcase_dummy")
-  _unittest_flag_help=true
-  _unittest_flag_list=true
-  _unittest_flag_force=true
+  unittest_all_tests=("testcase_dummy")
+  unittest_all_descriptions=("this is a dummy test")
+  unittest_specified_tests=("testcase_dummy")
+  unittest_tests_to_run=("testcase_dummy")
+  unittest_executed_tests=("testcase_dummy")
+  unittest_passed_tests=("testcase_dummy")
+  unittest_failed_tests=("testcase_dummy")
+  unittest_skipped_tests=("testcase_dummy")
+  unittest_flag_help=true
+  unittest_flag_list=true
+  unittest_flag_force=true
   # When the function is called,
-  _unittest_initialize
+  unittest_initialize
   # Then they are initialized.
-  [ ${#_unittest_all_tests[@]} -eq 0 ]
-  [ ${#_unittest_all_descriptions[@]} -eq 0 ]
-  [ ${#_unittest_specified_tests[@]} -eq 0 ]
-  [ ${#_unittest_tests_to_run[@]} -eq 0 ]
-  [ ${#_unittest_executed_tests[@]} -eq 0 ]
-  [ ${#_unittest_passed_tests[@]} -eq 0 ]
-  [ ${#_unittest_failed_tests[@]} -eq 0 ]
-  [ ${#_unittest_skipped_tests[@]} -eq 0 ]
-  [ $_unittest_flag_help = false ]
-  [ $_unittest_flag_list = false ]
-  [ $_unittest_flag_force = false ]
+  [ ${#unittest_all_tests[@]} -eq 0 ]
+  [ ${#unittest_all_descriptions[@]} -eq 0 ]
+  [ ${#unittest_specified_tests[@]} -eq 0 ]
+  [ ${#unittest_tests_to_run[@]} -eq 0 ]
+  [ ${#unittest_executed_tests[@]} -eq 0 ]
+  [ ${#unittest_passed_tests[@]} -eq 0 ]
+  [ ${#unittest_failed_tests[@]} -eq 0 ]
+  [ ${#unittest_skipped_tests[@]} -eq 0 ]
+  [ $unittest_flag_help = false ]
+  [ $unittest_flag_list = false ]
+  [ $unittest_flag_force = false ]
 }
 
 testcase_reset_vars() {
   it "should reset variables to their defaults"
-  reserved_description=$_unittest_description
+  reserved_description=$unittest_description
 
   # Given that fake values are assigned,
-  _unittest_description="testcase_dummy"
-  _unittest_skip_note="skip the dummy test"
-  _unittest_failed=true
-  _unittest_skipped=true
-  _unittest_err_source=("test_unittest.sh")
-  _unittest_err_lineno=("105")
-  _unittest_err_status=("1")
+  unittest_description="testcase_dummy"
+  unittest_skip_note="skip the dummy test"
+  unittest_failed=true
+  unittest_skipped=true
+  unittest_err_source=("test_unittest.sh")
+  unittest_err_lineno=("105")
+  unittest_err_status=("1")
   status=1234
   output="hoge"
   lines=("hoge" "fuga" "foo")
   # When the variables are reset,
-  _unittest_reset_vars
+  unittest_reset_vars
   # Then they are set to their defaults.
-  [ -z $_unittest_description ]
-  [ -z $_unittest_skip_note ]
-  [ $_unittest_failed = false ]
-  [ $_unittest_skipped = false ]
-  [ ${#_unittest_err_source[@]} -eq 0 ]
-  [ ${#_unittest_err_lineno[@]} -eq 0 ]
-  [ ${#_unittest_err_status[@]} -eq 0 ]
+  [ -z $unittest_description ]
+  [ -z $unittest_skip_note ]
+  [ $unittest_failed = false ]
+  [ $unittest_skipped = false ]
+  [ ${#unittest_err_source[@]} -eq 0 ]
+  [ ${#unittest_err_lineno[@]} -eq 0 ]
+  [ ${#unittest_err_status[@]} -eq 0 ]
   [ $status -eq 0 ]
   [ -z $output ]
   [ ${#lines[@]} -eq 0 ]
 
-  _unittest_description=$reserved_description
+  unittest_description=$reserved_description
 }
 
 mock_not_skip() {
@@ -202,43 +202,43 @@ testcase_categorize_by_result_passed() {
   it "should categorize a test into an appropriate group if it's passed"
 
   # Given that the test case is passed,
-  _unittest_skipped=false
-  _unittest_failed=false
+  unittest_skipped=false
+  unittest_failed=false
   local testcase="testcase_dummy"
-  _unittest_executed_tests=()
-  _unittest_passed_tests=()
-  _unittest_failed_tests=()
-  _unittest_skipped_tests=()
+  unittest_executed_tests=()
+  unittest_passed_tests=()
+  unittest_failed_tests=()
+  unittest_skipped_tests=()
   # When the function is executed,
   _unittest_categorize_by_result "$testcase"
   # Then the function is categorized into passed.
-  [ "${_unittest_executed_tests[0]}" = "$testcase" ]
-  [ "${_unittest_passed_tests[0]}" = "$testcase" ]
-  [ ${#_unittest_failed_tests[@]} -eq 0 ]
-  [ ${#_unittest_skipped_tests[@]} -eq 0 ]
+  [ "${unittest_executed_tests[0]}" = "$testcase" ]
+  [ "${unittest_passed_tests[0]}" = "$testcase" ]
+  [ ${#unittest_failed_tests[@]} -eq 0 ]
+  [ ${#unittest_skipped_tests[@]} -eq 0 ]
 }
 
 testcase_categorize_by_result_failed() {
   it "should categorize a test into an appropriate group if it's failed"
 
   # Given that the test case is passed,
-  _unittest_skipped=false
-  _unittest_failed=true
+  unittest_skipped=false
+  unittest_failed=true
   local testcase="testcase_dummy"
-  _unittest_executed_tests=()
-  _unittest_passed_tests=()
-  _unittest_failed_tests=()
-  _unittest_skipped_tests=()
+  unittest_executed_tests=()
+  unittest_passed_tests=()
+  unittest_failed_tests=()
+  unittest_skipped_tests=()
   # When the function is executed,
   _unittest_categorize_by_result "$testcase"
   # Then the function is categorized into passed.
-  [ "${_unittest_executed_tests[0]}" = "$testcase" ]
-  [ ${#_unittest_passed_tests[@]} -eq 0 ]
-  [ "${_unittest_failed_tests[0]}" = "$testcase" ]
-  [ ${#_unittest_skipped_tests[@]} -eq 0 ]
+  [ "${unittest_executed_tests[0]}" = "$testcase" ]
+  [ ${#unittest_passed_tests[@]} -eq 0 ]
+  [ "${unittest_failed_tests[0]}" = "$testcase" ]
+  [ ${#unittest_skipped_tests[@]} -eq 0 ]
 
-  if ((${#_unittest_err_status[@]} == 0)); then
-    _unittest_failed=false
+  if ((${#unittest_err_status[@]} == 0)); then
+    unittest_failed=false
   fi
 }
 
@@ -246,22 +246,22 @@ testcase_categorize_by_result_skipped() {
   it "should categorize a test into an appropriate group if it's skipped"
 
   # Given that the test case is passed,
-  _unittest_skipped=true
-  _unittest_failed=false
+  unittest_skipped=true
+  unittest_failed=false
   local testcase="testcase_dummy"
-  _unittest_executed_tests=()
-  _unittest_passed_tests=()
-  _unittest_failed_tests=()
-  _unittest_skipped_tests=()
+  unittest_executed_tests=()
+  unittest_passed_tests=()
+  unittest_failed_tests=()
+  unittest_skipped_tests=()
   # When the function is executed,
   _unittest_categorize_by_result "$testcase"
   # Then the function is categorized into passed.
-  [ "${_unittest_executed_tests[0]}" = "$testcase" ]
-  [ ${#_unittest_passed_tests[@]} -eq 0 ]
-  [ ${#_unittest_failed_tests[@]} -eq 0 ]
-  [ "${_unittest_skipped_tests[0]}" = "$testcase" ]
+  [ "${unittest_executed_tests[0]}" = "$testcase" ]
+  [ ${#unittest_passed_tests[@]} -eq 0 ]
+  [ ${#unittest_failed_tests[@]} -eq 0 ]
+  [ "${unittest_skipped_tests[0]}" = "$testcase" ]
 
-  _unittest_skipped=false
+  unittest_skipped=false
 }
 
 testcase_it() {
@@ -368,7 +368,7 @@ testcase_run_throw_error_when_command_not_found() {
   local _status
   run hoge 2>/dev/null
   _status=$?
-  _unittest_failed=false
+  unittest_failed=false
   [ $_status -ne 0 ]
 }
 
@@ -386,7 +386,7 @@ testcase_print_result_fail() {
   linenum="$(grep -ne "^  false # should.*number" "$0" | cut -d':' -f1)"
 
   false # should appear this line number
-  _unittest_failed=false
+  unittest_failed=false
   run _unittest_print_result_fail
   [ "${lines[0]}" = "$(tput setaf 1) ✗ should print the result for a failed test case$(tput sgr0)" ]
   [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line $linenum)" ]
@@ -399,7 +399,7 @@ testcase_print_result_skip() {
   run _unittest_print_result_skip
   [ "${lines[0]}" = " - should print the result for a skipped test case (skipped)" ]
 
-  _unittest_skip_note="this is skipped"
+  unittest_skip_note="this is skipped"
   run _unittest_print_result_skip
   [ "${lines[0]}" =\
     " - should print the result for a skipped test case (skipped: this is skipped)" ]
@@ -453,10 +453,10 @@ testcase_pluralize_ends_in_s() {
 }
 
 _testcase_parse_flags_setup() {
-  _unittest_initialize
-  [ "$_unittest_flag_help" = false ]
-  [ "$_unittest_flag_list" = false ]
-  [ "$_unittest_flag_force" = false ]
+  unittest_initialize
+  [ "$unittest_flag_help" = false ]
+  [ "$unittest_flag_list" = false ]
+  [ "$unittest_flag_force" = false ]
 }
 
 testcase_parse_flags_help() {
@@ -464,11 +464,11 @@ testcase_parse_flags_help() {
 
   _testcase_parse_flags_setup
   unittest_parse -h
-  [ "$_unittest_flag_help" = true ]
+  [ "$unittest_flag_help" = true ]
 
   _testcase_parse_flags_setup
   unittest_parse --help
-  [ "$_unittest_flag_help" = true ]
+  [ "$unittest_flag_help" = true ]
 }
 
 testcase_parse_flags_list() {
@@ -476,11 +476,11 @@ testcase_parse_flags_list() {
 
   _testcase_parse_flags_setup
   unittest_parse -l
-  [ "$_unittest_flag_list" = true ]
+  [ "$unittest_flag_list" = true ]
 
   _testcase_parse_flags_setup
   unittest_parse --list-tests
-  [ "$_unittest_flag_list" = true ]
+  [ "$unittest_flag_list" = true ]
 }
 
 testcase_parse_flags_force() {
@@ -488,11 +488,11 @@ testcase_parse_flags_force() {
 
   _testcase_parse_flags_setup
   unittest_parse -f
-  [ "$_unittest_flag_force" = true ]
+  [ "$unittest_flag_force" = true ]
 
   _testcase_parse_flags_setup
   unittest_parse --force-run
-  [ "$_unittest_flag_force" = true ]
+  [ "$unittest_flag_force" = true ]
 }
 
 testcase_parse_flags_unsupported() {
@@ -513,13 +513,13 @@ testcase_parse_flags_positional_args() {
   it "should store positional arguments to a variable"
 
   unittest_parse "should test something" "should check an awesome thing"
-  [ "${_unittest_specified_tests[0]}" = "should test something" ]
-  [ "${_unittest_specified_tests[1]}" = "should check an awesome thing" ]
+  [ "${unittest_specified_tests[0]}" = "should test something" ]
+  [ "${unittest_specified_tests[1]}" = "should check an awesome thing" ]
 
   unittest_parse -f "test 01" "test 02"
-  [ "$_unittest_flag_force" = true ]
-  [ "${_unittest_specified_tests[0]}" = "test 01" ]
-  [ "${_unittest_specified_tests[1]}" = "test 02" ]
+  [ "$unittest_flag_force" = true ]
+  [ "${unittest_specified_tests[0]}" = "test 01" ]
+  [ "${unittest_specified_tests[1]}" = "test 02" ]
 }
 
 testcase_collect_testcases_check_num() {
@@ -528,8 +528,8 @@ testcase_collect_testcases_check_num() {
   local n_testcases
   n_testcases="$(grep -e "^testcase_.*() {$" "$0" | wc -l)"
 
-  [ "${#_unittest_all_tests[@]}" = "$n_testcases" ]
-  [ "${#_unittest_all_descriptions[@]}" = "$n_testcases" ]
+  [ "${#unittest_all_tests[@]}" = "$n_testcases" ]
+  [ "${#unittest_all_descriptions[@]}" = "$n_testcases" ]
 }
 
 testcase_collect_testcases_dummy01() {
@@ -557,20 +557,20 @@ testcase_collect_testcases_dummy05() {
 #   it "should check if the created map stores keys and values correctly"
 
 #   local key="this is a dummy test"
-#   [ "${_unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy01" ]
+#   [ "${unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy01" ]
 
 #   key='this is a dummy test which has a so so so so loooooooooong description that it does not fit into one line'
-#   [ "${_unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy02" ]
+#   [ "${unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy02" ]
 
 #   # When no description is provided, the key should be its function name
 #   key="testcase_collect_testcases_dummy03"
-#   [ "${_unittest_all_tests_map[$key]}" = "$key" ]
+#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
 
 #   key="testcase_collect_testcases_dummy04"
-#   [ "${_unittest_all_tests_map[$key]}" = "$key" ]
+#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
 
 #   key="testcase_collect_testcases_dummy05"
-#   [ "${_unittest_all_tests_map[$key]}" = "$key" ]
+#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
 # }
 
 unittest_main "$@"

@@ -100,63 +100,63 @@
 set -u
 
 # Set an option so that any trap on ERR signal is caught to turn
-# `_unittest_failed` flag on. This is the same as `set -E`. Note that
+# `unittest_failed` flag on. This is the same as `set -E`. Note that
 # `set -o errexit` or `set -e` can not be used here since that option
 # exits immediately when ERR is sent.
 set -o errtrace
-trap _unittest_errtrap ERR
+trap unittest_errtrap ERR
 
 
 ### Global variables used throughout running the all test cases.
 
 # Contains a filename of the test script.
-_unittest_script_filename="${BASH_SOURCE[1]}"
+unittest_script_filename="${BASH_SOURCE[1]}"
 
 # Contains the working directory to run test cases. Its default value
 # is the current working directory, but it may be modified with
 # command arguments.
-_unittest_working_directory="$(pwd)"
+unittest_working_directory="$(pwd)"
 
 
 ### Global variables which store executed tests and their results.
 
 # An array which contains all the function names defined in the test
 # script. It is built by the `unittest_collect_testcases` function.
-_unittest_all_tests=()
+unittest_all_tests=()
 
 # An array which contains all the descriptions provided by the user
 # for the test cases.
-_unittest_all_descriptions=()
+unittest_all_descriptions=()
 
 # An array which contains specified test cases by the user.
-_unittest_specified_tests=()
+unittest_specified_tests=()
 
 # An array which contains function names to run.
-_unittest_tests_to_run=()
+unittest_tests_to_run=()
 
 # An array which contains function names actually executed.
-_unittest_executed_tests=()
+unittest_executed_tests=()
 
 # An array which contains function names of passed test cases.
-_unittest_passed_tests=()
+unittest_passed_tests=()
 
 # An array which contains function names of failed test cases.
-_unittest_failed_tests=()
+unittest_failed_tests=()
 
 # An array which contains function names of skipped test cases.
-_unittest_skipped_tests=()
+unittest_skipped_tests=()
 
 
 ### Flags to control behavior based on the command line arguments.
 
 # Flag to show help message and exit.
-_unittest_flag_help=false
+unittest_flag_help=false
 
 # Flag to show the list available tests and exit.
-_unittest_flag_list=false
+unittest_flag_list=false
 
 # Flag to run skipping test forcely.
-_unittest_flag_force=false
+unittest_flag_force=false
 
 
 ### Global variables cleared or initialized prior to running each test
@@ -165,34 +165,34 @@ _unittest_flag_force=false
 # Contains a function which is about to run (or currently running) as
 # a test case. Its value should start with 'testcase_' so as to be
 # collected automatically by `unittest_collect_testcases`.
-_unittest_testcase=
+unittest_testcase=
 
 # Contains a string which describes the current test case. It is given
 # by the `it` command.
-_unittest_description=
+unittest_description=
 
 # Contains notes why a test case is skipped. It is given as an
 # optional argument of the `skip` command.
-_unittest_skip_note=
+unittest_skip_note=
 
 # Keeps the state whether a test case is failed or not. When it is set
 # to `true`, it means the most recent test case failed.
-_unittest_failed=false
+unittest_failed=false
 
 # When a test case is skipped, this flag is set to `true`.
-_unittest_skipped=false
+unittest_skipped=false
 
 # An array which contains source filenames corresponding to functions
 # being executed when ERR signal is trapped.
-_unittest_err_source=()
+unittest_err_source=()
 
 # An array which contains line numbers in source files corresponding
 # to functions being executed when ERR signal is trapped.
-_unittest_err_lineno=()
+unittest_err_lineno=()
 
 # An array which contains statuses returned from functions when ERR
 # signal is trapped.
-_unittest_err_status=()
+unittest_err_status=()
 
 
 ### Global variables used in test scripts.
@@ -230,32 +230,32 @@ error() {
 # Initialize global variables listed below which are used throughout
 # running all tests.
 # Globals:
-#   _unittest_all_tests
-#   _unittest_all_descriptions
-#   _unittest_specified_tests
-#   _unittest_tests_to_run
-#   _unittest_executed_tests
-#   _unittest_passed_tests
-#   _unittest_failed_tests
-#   _unittest_skipped_tests
-#   _unittest_flag_help
-#   _unittest_flag_list
-#   _unittest_flag_force
+#   unittest_all_tests
+#   unittest_all_descriptions
+#   unittest_specified_tests
+#   unittest_tests_to_run
+#   unittest_executed_tests
+#   unittest_passed_tests
+#   unittest_failed_tests
+#   unittest_skipped_tests
+#   unittest_flag_help
+#   unittest_flag_list
+#   unittest_flag_force
 # Arguments:
 #   None
 ######################################################################
-_unittest_initialize() {
-  _unittest_all_tests=()
-  _unittest_all_descriptions=()
-  _unittest_specified_tests=()
-  _unittest_tests_to_run=()
-  _unittest_executed_tests=()
-  _unittest_passed_tests=()
-  _unittest_failed_tests=()
-  _unittest_skipped_tests=()
-  _unittest_flag_help=false
-  _unittest_flag_list=false
-  _unittest_flag_force=false
+unittest_initialize() {
+  unittest_all_tests=()
+  unittest_all_descriptions=()
+  unittest_specified_tests=()
+  unittest_tests_to_run=()
+  unittest_executed_tests=()
+  unittest_passed_tests=()
+  unittest_failed_tests=()
+  unittest_skipped_tests=()
+  unittest_flag_help=false
+  unittest_flag_list=false
+  unittest_flag_force=false
 }
 
 ######################################################################
@@ -263,23 +263,23 @@ _unittest_initialize() {
 # store the source file, the location and the status code where the
 # ERR signal has been sent.
 # Globals:
-#   _unittest_failed
-#   _unittest_err_source
-#   _unittest_err_lineno
-#   _unittest_err_status
+#   unittest_failed
+#   unittest_err_source
+#   unittest_err_lineno
+#   unittest_err_status
 # Arguments:
 #   None
 ######################################################################
-_unittest_errtrap() {
+unittest_errtrap() {
   # Keep the exit status returned by the last function or command.
   local _status="$?"
 
   # Check if ERR signal is sent from the test script.
-  if [[ "${BASH_SOURCE[1]}" = "$_unittest_script_filename" ]]; then
-    _unittest_failed=true
-    _unittest_err_source+=("${BASH_SOURCE[1]}")
-    _unittest_err_lineno+=("${BASH_LINENO[0]}")
-    _unittest_err_status+=("$_status")
+  if [[ "${BASH_SOURCE[1]}" = "$unittest_script_filename" ]]; then
+    unittest_failed=true
+    unittest_err_source+=("${BASH_SOURCE[1]}")
+    unittest_err_lineno+=("${BASH_LINENO[0]}")
+    unittest_err_status+=("$_status")
   fi
 }
 
@@ -288,24 +288,24 @@ _unittest_errtrap() {
 # to their default values. This function should be executed prior to
 # running each test.
 # Globals:
-#   _unittest_description
-#   _unittest_skip_note
-#   _unittest_failed
-#   _unittest_skipped
-#   _unittest_err_source
-#   _unittest_err_lineno
-#   _unittest_err_status
+#   unittest_description
+#   unittest_skip_note
+#   unittest_failed
+#   unittest_skipped
+#   unittest_err_source
+#   unittest_err_lineno
+#   unittest_err_status
 # Arguments:
 #   None
 ######################################################################
-_unittest_reset_vars() {
-  _unittest_description=
-  _unittest_skip_note=
-  _unittest_failed=false
-  _unittest_skipped=false
-  _unittest_err_source=()
-  _unittest_err_lineno=()
-  _unittest_err_status=()
+unittest_reset_vars() {
+  unittest_description=
+  unittest_skip_note=
+  unittest_failed=false
+  unittest_skipped=false
+  unittest_err_source=()
+  unittest_err_lineno=()
+  unittest_err_status=()
   status=0
   output=
   lines=()
@@ -347,10 +347,10 @@ _unittest_extract_description() {
 }
 
 ######################################################################
-# Return the index of the array `_unittest_all_descriptions` whose
+# Return the index of the array `unittest_all_descriptions` whose
 # value is the supplied description.
 # Globals:
-#   _unittest_all_descriptions
+#   unittest_all_descriptions
 # Arguments:
 #   Description of a test case, a string.
 # Outputs:
@@ -364,8 +364,8 @@ _unittest_get_index_from_description() {
   local desc="$1"
   local index=
   local found=false
-  for index in "${!_unittest_all_descriptions[@]}"; do
-    if [[ "$desc" == "${_unittest_all_descriptions[$index]}" ]]; then
+  for index in "${!unittest_all_descriptions[@]}"; do
+    if [[ "$desc" == "${unittest_all_descriptions[$index]}" ]]; then
       found=true
     fi
   done
@@ -375,23 +375,23 @@ _unittest_get_index_from_description() {
 ######################################################################
 # Collects functions whose names begin with `testcase_` and their
 # descriptions provided by the user. Function names and descriptions
-# are stored in global variables `_unittest_all_tests` and
-# `_unittest_all_descriptions`, respectively.
+# are stored in global variables `unittest_all_tests` and
+# `unittest_all_descriptions`, respectively.
 # Globals:
-#   _unittest_all_tests
-#   _unittest_all_descriptions
+#   unittest_all_tests
+#   unittest_all_descriptions
 # Arguments:
 #   None
 ######################################################################
-_unittest_collect_testcases() {
+unittest_collect_testcases() {
   local regex_find_testcase="^testcase_.*"
   local _func=
   local _desc=
 
   while IFS= read -r _func; do
     _desc="$(_unittest_extract_description "$_func")"
-    _unittest_all_tests+=("$_func")
-    _unittest_all_descriptions+=("$_desc")
+    unittest_all_tests+=("$_func")
+    unittest_all_descriptions+=("$_desc")
   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_find_testcase")
 }
 
@@ -422,35 +422,35 @@ _unittest_handle_skipped_test() {
 # Shows the description of the current test case. If no description
 # provided, just its function name will be shown.
 # Globals:
-#   _unittest_description
+#   unittest_description
 # Arguments:
 #   None.
 # Outputs:
 #   Writes its description to stdout.
 ######################################################################
 _unittest_describe() {
-  if [[ -z "$_unittest_description" ]]; then
-    echo "$_unittest_testcase"
+  if [[ -z "$unittest_description" ]]; then
+    echo "$unittest_testcase"
   else
-    echo "$_unittest_description"
+    echo "$unittest_description"
   fi
 }
 
 ######################################################################
 # Execute pre-processing stuff before running each test.
 # Globals:
-#   _unittest_testcase
+#   unittest_testcase
 # Arguments:
 #   Test case to run, a function name.
 ######################################################################
 _unittest_preprocesses() {
   # set the function name of the current test case
-  _unittest_testcase="$1"
+  unittest_testcase="$1"
   # reset variables
-  _unittest_reset_vars
-  if [[ "$_unittest_flag_force" = false ]]; then
+  unittest_reset_vars
+  if [[ "$unittest_flag_force" = false ]]; then
     # handle a skipped test
-    _unittest_handle_skipped_test "$_unittest_testcase"
+    _unittest_handle_skipped_test "$unittest_testcase"
   fi
 }
 
@@ -458,33 +458,33 @@ _unittest_preprocesses() {
 # Categorize an executed test case into one of the groups, passed,
 # failed or skipped.
 # Gloabls:
-#   _unittest_failed
-#   _unittest_skipped
-#   _unittest_passed_tests
-#   _unittest_failed_tests
-#   _unittest_skipped_tests
+#   unittest_failed
+#   unittest_skipped
+#   unittest_passed_tests
+#   unittest_failed_tests
+#   unittest_skipped_tests
 # Arguments:
 #   Test case to run, a function name
 ######################################################################
 _unittest_categorize_by_result() {
   local testcase="$1"
 
-  _unittest_executed_tests+=("$testcase")
-  if [[ $_unittest_skipped = true ]]; then
-    _unittest_skipped_tests+=("$testcase")
-  elif [[ $_unittest_failed = true ]]; then
-    _unittest_failed_tests+=("$testcase")
+  unittest_executed_tests+=("$testcase")
+  if [[ $unittest_skipped = true ]]; then
+    unittest_skipped_tests+=("$testcase")
+  elif [[ $unittest_failed = true ]]; then
+    unittest_failed_tests+=("$testcase")
   else
-    _unittest_passed_tests+=("$testcase")
+    unittest_passed_tests+=("$testcase")
   fi
 }
 
 ######################################################################
 # Execute post-processing stuff after running each test.
 # Globals:
-#   _unittest_skipped_tests
-#   _unittest_failed_tests
-#   _unittest_passed_tests
+#   unittest_skipped_tests
+#   unittest_failed_tests
+#   unittest_passed_tests
 # Arguments:
 #   Test case to run, a function name
 ######################################################################
@@ -507,27 +507,27 @@ _unittest_print_result_fail() {
   local failure_location failure_detail
 
   printf "%s ✗ %s%s\n" "$red" "$(_unittest_describe)" "$reset"
-  for i in "${!_unittest_err_status[@]}"; do
-    source="${_unittest_err_source[$i]}"
-    lineno="${_unittest_err_lineno[$i]}"
+  for i in "${!unittest_err_status[@]}"; do
+    source="${unittest_err_source[$i]}"
+    lineno="${unittest_err_lineno[$i]}"
     failure_location="$(printf "test file %s, line %d" "$source" "$lineno")"
     failure_detail="$(sed -e "${lineno}q;d" "$source" | sed -e "s/^[[:space:]]*//")"
     printf "%s   (in %s)\n     \`%s' failed with %d%s\n"\
            "$brightred" "$failure_location" "$failure_detail" \
-           "${_unittest_err_status[$i]}" "$reset"
+           "${unittest_err_status[$i]}" "$reset"
   done
 }
 
 _unittest_print_result_skip() {
   local skip_note
-  skip_note="${_unittest_skip_note:+: }${_unittest_skip_note}"
+  skip_note="${unittest_skip_note:+: }${unittest_skip_note}"
   printf " - %s (skipped%s)\n" "$(_unittest_describe)" "$skip_note"
 }
 
 _unittest_print_result() {
-  if [[ $_unittest_skipped = true ]]; then
+  if [[ $unittest_skipped = true ]]; then
     _unittest_print_result_skip
-  elif [[ $_unittest_failed = true ]]; then
+  elif [[ $unittest_failed = true ]]; then
     _unittest_print_result_fail
   else
     _unittest_print_result_pass
@@ -603,7 +603,7 @@ pluralize() {
 #   None
 ######################################################################
 unittest_setup() {
-  _unittest_initialize
+  unittest_initialize
 }
 
 ######################################################################
@@ -617,7 +617,7 @@ unittest_setup() {
 ######################################################################
 unittest_help() {
   cat <<- EOT
-Run unit tests defined in \`${_unittest_script_filename#./}' and print
+Run unit tests defined in \`${unittest_script_filename#./}' and print
 the result of each test case and the summary.
 
 Usage: $0 [-l] [-f] [-h] <test-spec> ...
@@ -649,10 +649,10 @@ unittest_list_tests() {
   local index=
   local func=
   local desc=
-  printf "%d tests found\n" "${#_unittest_all_tests[@]}"
-  for index in "${!_unittest_all_tests[@]}"; do
-    func="${_unittest_all_tests[$index]}"
-    desc="${_unittest_all_descriptions[$index]}"
+  printf "%d tests found\n" "${#unittest_all_tests[@]}"
+  for index in "${!unittest_all_tests[@]}"; do
+    func="${unittest_all_tests[$index]}"
+    desc="${unittest_all_descriptions[$index]}"
     printf "%2d: %s: %s\n" "$index" "$func" "$desc"
   done
 }
@@ -672,15 +672,15 @@ unittest_parse() {
     param="$1"
     case "$param" in
       -l|--list-tests)
-        _unittest_flag_list=true
+        unittest_flag_list=true
         shift
         ;;
       -f|--force-run)
-        _unittest_flag_force=true
+        unittest_flag_force=true
         shift
         ;;
       -h|--help)
-        _unittest_flag_help=true
+        unittest_flag_help=true
         shift
         ;;
       -*)
@@ -696,7 +696,7 @@ unittest_parse() {
   done
 
   set -- "${testspecs[@]}"
- _unittest_specified_tests=("${testspecs[@]}")
+ unittest_specified_tests=("${testspecs[@]}")
 }
 
 ######################################################################
@@ -707,16 +707,16 @@ unittest_parse() {
 #   None
 ######################################################################
 unittest_decide_testcases() {
-  _unittest_collect_testcases
+  unittest_collect_testcases
 }
 
 unittest_run_testcases() {
   local testcase
 
-  for testcase in "${_unittest_all_tests[@]}"; do
+  for testcase in "${unittest_all_tests[@]}"; do
     _unittest_preprocesses "$testcase"
     setup
-    $_unittest_testcase
+    $unittest_testcase
     teardown
     _unittest_postprocesses "$testcase"
     _unittest_print_result
@@ -728,9 +728,9 @@ unittest_print_summary() {
   local summary
 
   # store numbers of executed tests in variables
-  n_tests=${#_unittest_all_tests[@]}
-  n_failed=${#_unittest_failed_tests[@]}
-  n_skipped=${#_unittest_skipped_tests[@]}
+  n_tests=${#unittest_all_tests[@]}
+  n_failed=${#unittest_failed_tests[@]}
+  n_skipped=${#unittest_skipped_tests[@]}
 
   # make summary text
   summary=""
@@ -774,7 +774,7 @@ teardown() {
 #   Description of test case, string
 ######################################################################
 it() {
-  _unittest_description="${*:-$_unittest_testcase}"
+  unittest_description="${*:-$unittest_testcase}"
 }
 
 ######################################################################
@@ -818,16 +818,16 @@ run() {
 # executed. It accepts the reason for skipping as an additional
 # argument.
 # Globals:
-#   _unittest_skip_note
-#   _unittest_skipped
+#   unittest_skip_note
+#   unittest_skipped
 # Arguments:
 #   Reason for skipping, string (optional)
 ######################################################################
 skip() {
-  [[ "$_unittest_flag_force" = true ]] && return
+  [[ "$unittest_flag_force" = true ]] && return
 
-  _unittest_skip_note="${1:-}"
-  _unittest_skipped=true
+  unittest_skip_note="${1:-}"
+  unittest_skipped=true
 }
 
 ######################################################################
@@ -842,11 +842,11 @@ skip() {
 unittest_main() {
   unittest_setup
   unittest_parse "$@"
-  if [[ "$_unittest_flag_help" = true ]]; then
+  if [[ "$unittest_flag_help" = true ]]; then
     unittest_help
     return 0
-  elif [[ "$_unittest_flag_list" = true ]]; then
-    _unittest_collect_testcases
+  elif [[ "$unittest_flag_list" = true ]]; then
+    unittest_collect_testcases
     unittest_list_tests
     return 0
   fi
