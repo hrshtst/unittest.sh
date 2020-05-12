@@ -39,7 +39,7 @@ copy_array() {
 }
 
 testcase_copy_array() {
-  it "copy_array" "should copy elements of an array to another"
+  describe "copy_array" "should copy elements of an array to another"
 
   local array1
   array1=([0]="value1" [1]="value2" [2]="value3")
@@ -52,7 +52,7 @@ testcase_copy_array() {
 }
 
 testcase_copy_associative_array() {
-  it "copy_array" "should copy elements of an associative array to another"
+  describe "copy_array" "should copy elements of an associative array to another"
 
   declare -A array1
   array1=(["key1"]="value1" ["key2"]="value2" ["key3"]="value3")
@@ -97,7 +97,7 @@ teardown() {
 }
 
 testcase_initialize() {
-  it "should initialize variables used throughout running tests"
+  describe "should initialize variables used throughout running tests"
 
   # Given that fake values are assigned,
   unittest_all_tests=("testcase_dummy")
@@ -128,7 +128,7 @@ testcase_initialize() {
 }
 
 testcase_reset_vars() {
-  it "should reset variables to their defaults"
+  describe "should reset variables to their defaults"
   reserved_description=$unittest_description
 
   # Given that fake values are assigned,
@@ -175,7 +175,7 @@ mock_skip_handled() {
 }
 
 testcase_handle_not_skipped_test() {
-  it "should do nothing for a test which is not skipped"
+  describe "should do nothing for a test which is not skipped"
 
   # Given that a test case definition which is not going to be skipped,
   local test_def1="$(declare -f mock_not_skip)"
@@ -187,7 +187,7 @@ testcase_handle_not_skipped_test() {
 }
 
 testcase_handle_skipped_test() {
-  it "should handle a skipped test"
+  describe "should handle a skipped test"
 
   # Given that a test case definition which is going to be skipped,
   # When the test case should be skipped,
@@ -199,7 +199,7 @@ testcase_handle_skipped_test() {
 }
 
 testcase_categorize_by_result_passed() {
-  it "should categorize a test into an appropriate group if it's passed"
+  describe "should categorize a test into an appropriate group if it's passed"
 
   # Given that the test case is passed,
   unittest_skipped=false
@@ -219,7 +219,7 @@ testcase_categorize_by_result_passed() {
 }
 
 testcase_categorize_by_result_failed() {
-  it "should categorize a test into an appropriate group if it's failed"
+  describe "should categorize a test into an appropriate group if it's failed"
 
   # Given that the test case is passed,
   unittest_skipped=false
@@ -243,7 +243,7 @@ testcase_categorize_by_result_failed() {
 }
 
 testcase_categorize_by_result_skipped() {
-  it "should categorize a test into an appropriate group if it's skipped"
+  describe "should categorize a test into an appropriate group if it's skipped"
 
   # Given that the test case is passed,
   unittest_skipped=true
@@ -264,17 +264,17 @@ testcase_categorize_by_result_skipped() {
   unittest_skipped=false
 }
 
-testcase_it() {
+testcase_describe() {
   local _desc="should store the description of the test case"
-  [ "$(_unittest_describe)" = "testcase_it" ]
+  [ "$(_unittest_describe)" = "testcase_describe" ]
 
-  it "$_desc"
+  describe "$_desc"
   [ "$(_unittest_describe)" = "$_desc" ]
 
-  it
-  [ "$(_unittest_describe)" = "testcase_it" ]
+  describe
+  [ "$(_unittest_describe)" = "testcase_describe" ]
 
-  it should store the description of the test case
+  describe should store the description of the test case
   [ "$(_unittest_describe)" = "$_desc" ]
 }
 
@@ -283,7 +283,7 @@ foo() {
 }
 
 testcase_run_return_0() {
-  it "should always return 0"
+  describe "should always return 0"
   local _status
 
   # No arguments.
@@ -303,7 +303,7 @@ testcase_run_return_0() {
 }
 
 testcase_run_capture_status() {
-  it "should capture status code returned by command with run"
+  describe "should capture status code returned by command with run"
 
   run foo
   [ $status -eq 10 ]
@@ -319,7 +319,7 @@ echo_whitebeard() {
 }
 
 testcase_run_capture_output() {
-  it "should capture output from arguments provided with the run command"
+  describe "should capture output from arguments provided with the run command"
 
   # capture the standard output.
   run echo "the king of the pirates"
@@ -348,7 +348,7 @@ echo_straw_hat_pirates() {
 }
 
 testcase_run_capture_lines() {
-  it "should capture output from arguments provided with the run line by line"
+  describe "should capture output from arguments provided with the run line by line"
 
   run echo_straw_hat_pirates
   [ "${lines[0]}" = "Monkey D. Luffy" ]
@@ -363,7 +363,7 @@ testcase_run_capture_lines() {
 }
 
 testcase_run_throw_error_when_command_not_found() {
-  it "should make run throw an error when command not found"
+  describe "should make run throw an error when command not found"
 
   local _status
   run hoge 2>/dev/null
@@ -373,14 +373,14 @@ testcase_run_throw_error_when_command_not_found() {
 }
 
 testcase_print_result_pass() {
-  it "should print the result for a passed test case"
+  describe "should print the result for a passed test case"
 
   run _unittest_print_result_pass
   [ "${lines[0]}" = " ✓ should print the result for a passed test case" ]
 }
 
 testcase_print_result_fail() {
-  it "should print the result for a failed test case"
+  describe "should print the result for a failed test case"
 
   local linenum
   linenum="$(grep -ne "^  false # should.*number" "$0" | cut -d':' -f1)"
@@ -394,7 +394,7 @@ testcase_print_result_fail() {
 }
 
 testcase_print_result_skip() {
-  it "should print the result for a skipped test case"
+  describe "should print the result for a skipped test case"
 
   run _unittest_print_result_skip
   [ "${lines[0]}" = " - should print the result for a skipped test case (skipped)" ]
@@ -406,7 +406,7 @@ testcase_print_result_skip() {
 }
 
 testcase_endswith_return_0() {
-  it "should return 0 if the word ends with the suffix"
+  describe "should return 0 if the word ends with the suffix"
 
   endswith "angry" "y"
   endswith "angry" "ry"
@@ -414,7 +414,7 @@ testcase_endswith_return_0() {
 }
 
 testcase_endswith_return_1() {
-  it "should return 1 if the word does not end with the suffix"
+  describe "should return 1 if the word does not end with the suffix"
 
   run endswith "angry" "x"
   [ "$status" -eq 1 ]
@@ -423,7 +423,7 @@ testcase_endswith_return_1() {
 }
 
 testcase_pluralize_regular() {
-  it "should pluralize a regular noun based on its count"
+  describe "should pluralize a regular noun based on its count"
 
   # case 1
   [ "$(pluralize test)" = "tests" ]
@@ -438,7 +438,7 @@ testcase_pluralize_regular() {
 }
 
 testcase_pluralize_ends_in_s() {
-  it "should add -es to the end if the the noun ends in -s"
+  describe "should add -es to the end if the the noun ends in -s"
 
   # bus
   [ "$(pluralize bus)" = "buses" ]
@@ -460,7 +460,7 @@ _testcase_parse_flags_setup() {
 }
 
 testcase_parse_flags_help() {
-  it "should set flags to show help message"
+  describe "should set flags to show help message"
 
   _testcase_parse_flags_setup
   unittest_parse -h
@@ -472,7 +472,7 @@ testcase_parse_flags_help() {
 }
 
 testcase_parse_flags_list() {
-  it "should set flags to list available tests"
+  describe "should set flags to list available tests"
 
   _testcase_parse_flags_setup
   unittest_parse -l
@@ -484,7 +484,7 @@ testcase_parse_flags_list() {
 }
 
 testcase_parse_flags_force() {
-  it "should set flags to force to run skipping tests"
+  describe "should set flags to force to run skipping tests"
 
   _testcase_parse_flags_setup
   unittest_parse -f
@@ -496,7 +496,7 @@ testcase_parse_flags_force() {
 }
 
 testcase_parse_flags_unsupported() {
-  it "should throw an error if unsupported option is supplied"
+  describe "should throw an error if unsupported option is supplied"
 
   _testcase_parse_flags_setup
   run unittest_parse -a
@@ -510,7 +510,7 @@ testcase_parse_flags_unsupported() {
 }
 
 testcase_parse_flags_positional_args() {
-  it "should store positional arguments to a variable"
+  describe "should store positional arguments to a variable"
 
   unittest_parse "should test something" "should check an awesome thing"
   [ "${unittest_specified_tests[0]}" = "should test something" ]
@@ -523,7 +523,7 @@ testcase_parse_flags_positional_args() {
 }
 
 testcase_collect_testcases_check_num() {
-  it "should check the number of collected testcases"
+  describe "should check the number of collected testcases"
 
   local n_testcases
   n_testcases="$(grep -e "^testcase_.*() {$" "$0" | wc -l)"
@@ -533,20 +533,20 @@ testcase_collect_testcases_check_num() {
 }
 
 testcase_collect_testcases_dummy01() {
-  it "this is a dummy test"
+  describe "this is a dummy test"
 }
 
 testcase_collect_testcases_dummy02() {
-  it 'this is a dummy test which has a so so so so loooooooooong description'\
-     'that it does not fit into one line'
+  describe 'this is a dummy test which has a so so so so loooooooooong description'\
+           'that it does not fit into one line'
 }
 
 testcase_collect_testcases_dummy03() {
-  it ""
+  describe ""
 }
 
 testcase_collect_testcases_dummy04() {
-  it
+  describe
 }
 
 testcase_collect_testcases_dummy05() {
@@ -554,7 +554,7 @@ testcase_collect_testcases_dummy05() {
 }
 
 # testcase_collect_testcases_check_map() {
-#   it "should check if the created map stores keys and values correctly"
+#   describe "should check if the created map stores keys and values correctly"
 
 #   local key="this is a dummy test"
 #   [ "${unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy01" ]

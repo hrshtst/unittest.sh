@@ -18,27 +18,27 @@
 # source unittest.sh
 #
 # testcase_add() {
-#   it "adds numbers using bc"
+#   describe "adds numbers using bc"
 #   result="$(echo 2+2 | bc)"
 #   [ "$result" -eq 4 ]
 # }
 #
 # testcase_run() {
-#   it "gets the word 'bar' with cut command"
+#   describe "gets the word 'bar' with cut command"
 #   run echo 'foo bar baz' | cut -d' ' -f2
 #   [ "$status" -eq 0 ]
 #   [ "$output" = "bar" ]
 # }
 #
 # testcase_skip() {
-#   it "is skipped"
+#   describe "is skipped"
 #   skip "foo command returns 0 but not now"
 #   run foo
 #   [ "$status" -eq 0 ]
 # }
 #
 # testcase_fail() {
-#   it "always fails"
+#   describe "always fails"
 #   false
 # }
 #
@@ -64,9 +64,9 @@
 # The order to execute test cases is sorted alphabetically. Each test
 # case is defined as a function whose name starts with `testcase_`.
 # Inside the test case a short description of the test should be put
-# in the first line with the `it` helper command. Afterwards, standard
-# shell commands can be written. If every command exits with the `0`
-# status, the test passes.
+# in the first line with the `describe` helper command. Afterwards,
+# standard shell commands can be written. If every command exits with
+# the `0` status, the test passes.
 #
 # The hepler command `run` invokes arguments as a bash command, then
 # stores its exit status in a variable `$status`. The `run` command
@@ -168,7 +168,7 @@ unittest_flag_force=false
 unittest_testcase=
 
 # Contains a string which describes the current test case. It is given
-# by the `it` command.
+# by the `describe` command.
 unittest_description=
 
 # Contains notes why a test case is skipped. It is given as an
@@ -325,14 +325,14 @@ unittest_reset_vars() {
 ######################################################################
 _unittest_extract_description() {
   local _func="$1"
-  local regex_find_it="^[[:space:]]\+it.*"
+  local regex_find_desc="^[[:space:]]\+describe.*"
   local sed_remove_quote="s/[\"';]//g"
-  local sed_find_desc="s/^[[:space:]]\+it \(.*\)/\1/p"
+  local sed_find_desc="s/^[[:space:]]\+describe \(.*\)/\1/p"
   local _line=
   local _desc=
 
-  # Find lines which contains `it` at the beginning.
-  _line="$(declare -f "$_func" | grep -e "$regex_find_it")"
+  # Find lines which contains `describe` at the beginning.
+  _line="$(declare -f "$_func" | grep -e "$regex_find_desc")"
   # Choose only the last one.
   _line="$(echo "$_line" | tail -1)"
   # Extract the description
@@ -766,14 +766,14 @@ teardown() {
 }
 
 ######################################################################
-# `it` command allows you to give a short description of each test
-# case to the test runner
+# `describe` command allows you to give a short description of each
+# test case to the test runner
 # Globals:
 #   _unjittest_description
 # Arguments:
 #   Description of test case, string
 ######################################################################
-it() {
+describe() {
   unittest_description="${*:-$unittest_testcase}"
 }
 
