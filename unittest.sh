@@ -107,31 +107,47 @@ set -o errtrace
 trap unittest_errtrap ERR
 
 
-### Global variables used throughout running the all test cases.
+### Global variables used throughout running the test script.
 
 # Contains a filename of the test script.
 unittest_script_filename="${BASH_SOURCE[1]}"
 
-# Contains the working directory to run test cases. Its default value
-# is the current working directory, but it may be modified with
-# command arguments.
+# Contains the working directory to run the script. Its default value
+# is the current working directory.
 unittest_working_directory="$(pwd)"
 
 
-### Global variables which store executed tests and their results.
+### Flags to control behavior based on the command line arguments.
+
+# Flag to show help message and exit.
+unittest_flag_help=false
+
+# Flag to show the list available tests and exit.
+unittest_flag_list=false
+
+# Flag to force to run tests specified as skipped.
+unittest_flag_force=false
+
+
+### Global variables which store test case names and manage their
+### results.
 
 # An array which contains all the function names defined in the test
 # script. It is built by the `unittest_collect_testcases` function.
 unittest_all_tests=()
 
 # An array which contains all the descriptions provided by the user
-# for the test cases.
+# with the `describe` command.
 unittest_all_descriptions=()
 
-# An array which contains specified test cases by the user.
+# An array which contains specified test cases to be run. Unlike
+# `unittest_tests_to_run`, this array is allowed to store test
+# function names, test descriptions or test indices.
 unittest_specified_tests=()
 
-# An array which contains function names to run.
+# An array which contains function names to be run. Unlike
+# `unittest_specified_tests`, this array only stores test function
+# names.
 unittest_tests_to_run=()
 
 # An array which contains function names actually executed.
@@ -145,18 +161,6 @@ unittest_failed_tests=()
 
 # An array which contains function names of skipped test cases.
 unittest_skipped_tests=()
-
-
-### Flags to control behavior based on the command line arguments.
-
-# Flag to show help message and exit.
-unittest_flag_help=false
-
-# Flag to show the list available tests and exit.
-unittest_flag_list=false
-
-# Flag to run skipping test forcely.
-unittest_flag_force=false
 
 
 ### Global variables cleared or initialized prior to running each test
