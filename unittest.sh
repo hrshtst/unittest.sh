@@ -217,7 +217,7 @@ export lines
 lines=()
 
 
-### Internal helper functions
+### Utility functions
 
 ######################################################################
 # Output an error message to the standard error.
@@ -229,6 +229,16 @@ lines=()
 error() {
   echo "$*" >&2
 }
+
+### Helper functions
+
+# NOTE:
+#   Functions whose name starts with `unittest_` are core helper
+#   functions which construct a logical structure of the
+#   `unittest_main` function and basically their functionalities are
+#   testsd in `test_unittest.sh`. Meanwhile, functions whose name
+#   starts with `_unittest_` are internal helper functions, so they
+#   are not tested in the script.
 
 ######################################################################
 # Initialize global variables listed below which are used throughout
