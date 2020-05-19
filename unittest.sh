@@ -243,6 +243,70 @@ error() {
   echo "$msg" >&2
 }
 
+######################################################################
+# Return True if the string ends with the specified suffix, otherwise
+# return False.
+# Globals:
+#   None
+# Arguments:
+#   A word, a string.
+#   A suffix, a string.
+# Returns:
+#   0(True) if the word ends with the suffix.
+#   1(False) otherwise.
+######################################################################
+endswith() {
+  if (( $# != 2 )); then
+    error "Function \`endswith' requires two positional arguments."
+    return 1
+  fi
+
+  local word="$1"
+  local suffix="$2"
+  local regex="^.*${suffix}$"
+  [[ "$word" =~ $regex ]] || return 1
+  return 0
+}
+
+######################################################################
+# Pluralize a word based on its count. When the count is omitted,
+# always make the word plural. (Not implemented completely yet.)
+# TODO:
+#   Implement irregular cases.
+# Globals:
+#   None
+# Arguments:
+#   A singular word, a string.
+#   The count of the word, a number.
+# Outputs:
+#   Writes pluralized or singular word to stdout.
+######################################################################
+pluralize() {
+  local word="$1"
+  local n="${2:-0}"
+
+  if (( n == 1 )); then
+    # Return a singular $word.
+    echo "${word}"
+    return 0
+  fi
+
+  # Make $word plural based on its suffix.
+  if endswith "$word" "s"; then
+    # Append -es as $word ends in s.
+    echo "${word}es"
+  else
+    # Append -es as $word is a regular noun.
+    echo "${word}s"
+  fi
+}
+
+# define colors of faces for printing results.
+reset=$(tput sgr0)
+red=$(tput setaf 1)
+brightred=$(tput setaf 9)
+
+
 ### Helper functions
 
 # NOTE:
@@ -520,11 +584,6 @@ _unittest_postprocesses() {
   _unittest_categorize_by_result "$testcase"
 }
 
-# define colors of faces for printing results.
-reset=$(tput sgr0)
-red=$(tput setaf 1)
-brightred=$(tput setaf 9)
-
 _unittest_print_result_pass() {
   printf " ✓ %s\n" "$(_unittest_describe)"
 }
@@ -560,65 +619,6 @@ _unittest_print_result() {
     _unittest_print_result_pass
   fi
 }
-
-######################################################################
-# Return True if the string ends with the specified suffix, otherwise
-# return False.
-# Globals:
-#   None
-# Arguments:
-#   A word, a string.
-#   A suffix, a string.
-# Returns:
-#   0(True) if the word ends with the suffix.
-#   1(False) otherwise.
-######################################################################
-endswith() {
-  if (( $# != 2 )); then
-    error "Function \`endswith' requires two positional arguments."
-    return 1
-  fi
-
-  local word="$1"
-  local suffix="$2"
-  local regex="^.*${suffix}$"
-  [[ "$word" =~ $regex ]] || return 1
-  return 0
-}
-
-######################################################################
-# Pluralize a word based on its count. When the count is omitted,
-# always make the word plural. (Not implemented completely yet.)
-# TODO:
-#   Implement irregular cases.
-# Globals:
-#   None
-# Arguments:
-#   A singular word, a string.
-#   The count of the word, a number.
-# Outputs:
-#   Writes pluralized or singular word to stdout.
-######################################################################
-pluralize() {
-  local word="$1"
-  local n="${2:-0}"
-
-  if (( n == 1 )); then
-    # Return a singular $word.
-    echo "${word}"
-    return 0
-  fi
-
-  # Make $word plural based on its suffix.
-  if endswith "$word" "s"; then
-    # Append -es as $word ends in s.
-    echo "${word}es"
-  else
-    # Append -es as $word is a regular noun.
-    echo "${word}s"
-  fi
-}
-
 
 ### Core functions
 
@@ -711,7 +711,7 @@ unittest_parse() {
         shift
         ;;
       -*)
-        error "$0: unsupported option: $param"
+        error "$0: unsupported option: $param" false
         return 1
         shift
         ;;
@@ -723,7 +723,7 @@ unittest_parse() {
   done
 
   set -- "${testspecs[@]}"
- unittest_specified_tests=("${testspecs[@]}")
+  unittest_specified_tests=("${testspecs[@]}")
 }
 
 ######################################################################

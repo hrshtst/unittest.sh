@@ -91,6 +91,53 @@ testcase_error_show_no_extra_info() {
   [ "$_output" = "this is also an error message" ]
 }
 
+testcase_endswith_return_0() {
+  describe "should return 0 if the word ends with the suffix"
+
+  endswith "angry" "y"
+  endswith "angry" "ry"
+  endswith "angry" "gry"
+}
+
+testcase_endswith_return_1() {
+  describe "should return 1 if the word does not end with the suffix"
+
+  run endswith "angry" "x"
+  [ "$status" -eq 1 ]
+  run endswith "angry" "gryx"
+  [ "$status" -eq 1 ]
+}
+
+testcase_pluralize_regular() {
+  describe "should pluralize a regular noun based on its count"
+
+  # case 1
+  [ "$(pluralize test)" = "tests" ]
+  [ "$(pluralize test 0)" = "tests" ]
+  [ "$(pluralize test 1)" = "test" ]
+  [ "$(pluralize test 2)" = "tests" ]
+  # case 2
+  [ "$(pluralize failure)" = "failures" ]
+  [ "$(pluralize failure 0)" = "failures" ]
+  [ "$(pluralize failure 1)" = "failure" ]
+  [ "$(pluralize failure 2)" = "failures" ]
+}
+
+testcase_pluralize_ends_in_s() {
+  describe "should add -es to the end if the the noun ends in -s"
+
+  # bus
+  [ "$(pluralize bus)" = "buses" ]
+  [ "$(pluralize bus 0)" = "buses" ]
+  [ "$(pluralize bus 1)" = "bus" ]
+  [ "$(pluralize bus 2)" = "buses" ]
+  # brass
+  [ "$(pluralize brass)" = "brasses" ]
+  [ "$(pluralize brass 0)" = "brasses" ]
+  [ "$(pluralize brass 1)" = "brass" ]
+  [ "$(pluralize brass 2)" = "brasses" ]
+}
+
 
 ### Testing of methods in `unittest.sh`.
 
@@ -430,53 +477,6 @@ testcase_print_result_skip() {
   run _unittest_print_result_skip
   [ "${lines[0]}" =\
     " - should print the result for a skipped test case (skipped: this is skipped)" ]
-}
-
-testcase_endswith_return_0() {
-  describe "should return 0 if the word ends with the suffix"
-
-  endswith "angry" "y"
-  endswith "angry" "ry"
-  endswith "angry" "gry"
-}
-
-testcase_endswith_return_1() {
-  describe "should return 1 if the word does not end with the suffix"
-
-  run endswith "angry" "x"
-  [ "$status" -eq 1 ]
-  run endswith "angry" "gryx"
-  [ "$status" -eq 1 ]
-}
-
-testcase_pluralize_regular() {
-  describe "should pluralize a regular noun based on its count"
-
-  # case 1
-  [ "$(pluralize test)" = "tests" ]
-  [ "$(pluralize test 0)" = "tests" ]
-  [ "$(pluralize test 1)" = "test" ]
-  [ "$(pluralize test 2)" = "tests" ]
-  # case 2
-  [ "$(pluralize failure)" = "failures" ]
-  [ "$(pluralize failure 0)" = "failures" ]
-  [ "$(pluralize failure 1)" = "failure" ]
-  [ "$(pluralize failure 2)" = "failures" ]
-}
-
-testcase_pluralize_ends_in_s() {
-  describe "should add -es to the end if the the noun ends in -s"
-
-  # bus
-  [ "$(pluralize bus)" = "buses" ]
-  [ "$(pluralize bus 0)" = "buses" ]
-  [ "$(pluralize bus 1)" = "bus" ]
-  [ "$(pluralize bus 2)" = "buses" ]
-  # brass
-  [ "$(pluralize brass)" = "brasses" ]
-  [ "$(pluralize brass 0)" = "brasses" ]
-  [ "$(pluralize brass 1)" = "brass" ]
-  [ "$(pluralize brass 2)" = "brasses" ]
 }
 
 _testcase_parse_flags_setup() {
