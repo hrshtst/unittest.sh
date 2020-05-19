@@ -224,10 +224,23 @@ lines=()
 # Globals:
 #   None
 # Arguments:
-#   An error message, a string
+#   An error message, a string.
+#   A flag to show an additional info, a boolean (optional)
+# Outputs:
+#   Error message to the standard error.
 ######################################################################
 error() {
-  echo "$*" >&2
+  local lineno
+  local funcname
+  local source
+  local show_info="${2:-true}"
+  local msg="${1}"
+
+  if [[ $show_info = true ]]; then
+    read -r lineno funcname source <<< "$(caller 0)"
+    msg="$source:$lineno [in $funcname()] $msg"
+  fi
+  echo "$msg" >&2
 }
 
 ### Helper functions

@@ -65,6 +65,33 @@ testcase_copy_associative_array() {
 }
 
 
+### Testing of utility functions in `unittest.sh`.
+
+testcase_error() {
+  describe "error" \
+           "should output an error message with the caller and location"
+
+  local lineno
+  local _output
+
+  lineno="$(grep -n "error \"this is an error message\"" "$0" | cut -d':' -f1)"
+  _output="$(error "this is an error message" 2>&1)"
+  [ "$_output" = "$0:$lineno [in testcase_error()] this is an error message" ]
+}
+
+testcase_error_show_no_extra_info() {
+  describe "error" \
+           "should output an error message without extra information"
+
+  local lineno
+  local _output
+
+  lineno="$(grep -n "error \"this is also an error message\"" "$0" | cut -d':' -f1)"
+  _output="$(error "this is also an error message" false 2>&1)"
+  [ "$_output" = "this is also an error message" ]
+}
+
+
 ### Testing of methods in `unittest.sh`.
 
 # The unit testing framework `unittest.sh` uses global variables whose
@@ -382,14 +409,14 @@ testcase_print_result_pass() {
 testcase_print_result_fail() {
   describe "should print the result for a failed test case"
 
-  local linenum
-  linenum="$(grep -ne "^  false # should.*number" "$0" | cut -d':' -f1)"
+  local lineno
+  lineno="$(grep -ne "^  false # should.*number" "$0" | cut -d':' -f1)"
 
   false # should appear this line number
   unittest_failed=false
   run _unittest_print_result_fail
   [ "${lines[0]}" = "$(tput setaf 1) ✗ should print the result for a failed test case$(tput sgr0)" ]
-  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line $linenum)" ]
+  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line $lineno)" ]
   [ "${lines[2]}" = "     \`false # should appear this line number' failed with 1$(tput sgr0)" ]
 }
 
