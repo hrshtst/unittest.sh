@@ -90,7 +90,7 @@ testcase_error_show_no_extra_info() {
 }
 
 error_inside() {
-  error "error message inside a function" true 2>&1
+  error "error message inside a function" true 1 2>&1
 }
 
 testcase_error_inside_function() {
@@ -99,11 +99,12 @@ testcase_error_inside_function() {
 
   local lineno
   local _output
+  local expected
 
-  lineno="$(grep -n "error \"error message inside a function\"" "$0" | cut -d':' -f1)"
+  lineno="$(grep -n "\"\$(error_inside)\"" "$0" | cut -d':' -f1)"
   _output="$(error_inside)"
-  echo "$_output"
-  [ "$_output" = "$0:$lineno [in testcase_error()] this is an error message" ]
+  expected="$0:$lineno [in testcase_error_inside_function()] error message inside a function"
+  [ "$_output" = "$expected" ]
 }
 
 testcase_endswith_return_0() {
