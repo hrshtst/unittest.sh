@@ -83,12 +83,27 @@ testcase_error_show_no_extra_info() {
   describe "error" \
            "should output an error message without extra information"
 
+  local _output
+
+  _output="$(error "this is also an error message" false 2>&1)"
+  [ "$_output" = "this is also an error message" ]
+}
+
+error_inside() {
+  error "error message inside a function" true 2>&1
+}
+
+testcase_error_inside_function() {
+  describe "error" \
+           "should output an error message inside a function as well"
+
   local lineno
   local _output
 
-  lineno="$(grep -n "error \"this is also an error message\"" "$0" | cut -d':' -f1)"
-  _output="$(error "this is also an error message" false 2>&1)"
-  [ "$_output" = "this is also an error message" ]
+  lineno="$(grep -n "error \"error message inside a function\"" "$0" | cut -d':' -f1)"
+  _output="$(error_inside)"
+  echo "$_output"
+  [ "$_output" = "$0:$lineno [in testcase_error()] this is an error message" ]
 }
 
 testcase_endswith_return_0() {

@@ -226,6 +226,7 @@ lines=()
 # Arguments:
 #   An error message, a string.
 #   A flag to show an additional info, a boolean (optional)
+#   A stack frame to show, an integar (optional)
 # Outputs:
 #   Error message to the standard error.
 ######################################################################
@@ -233,11 +234,12 @@ error() {
   local lineno
   local funcname
   local source
-  local show_info="${2:-true}"
   local msg="${1}"
+  local show_info="${2:-true}"
+  local frame="${3:-0}"
 
   if [[ $show_info = true ]]; then
-    read -r lineno funcname source <<< "$(caller 0)"
+    read -r lineno funcname source <<< "$(caller $frame)"
     msg="$source:$lineno [in $funcname()] $msg"
   fi
   echo "$msg" >&2
