@@ -547,8 +547,8 @@ testcase_print_result_fail() {
   unittest_failed=false
   run _unittest_print_result_fail
   [ "${lines[0]}" = "$(tput setaf 1) ✗ should print the result for a failed test case$(tput sgr0)" ]
-  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line $lineno)" ]
-  [ "${lines[2]}" = "     \`false # should appear this line number' failed with 1$(tput sgr0)" ]
+  [ "${lines[1]}" = "$(tput setaf 9)   (in test file ./test_unittest.sh, line $lineno)$(tput sgr0)" ]
+  [ "${lines[2]}" = "$(tput setaf 9)     \`false # should appear this line number' failed with 1$(tput sgr0)" ]
 }
 
 testcase_print_result_skip() {

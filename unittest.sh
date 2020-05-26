@@ -348,11 +348,6 @@ pluralize() {
   fi
 }
 
-# define colors of faces for printing results.
-reset=$(tput sgr0)
-red=$(tput setaf 1)
-brightred=$(tput setaf 9)
-
 
 ### Helper functions
 
@@ -636,19 +631,66 @@ _unittest_print_result_pass() {
   printf " ✓ %s\n" "$(_unittest_describe)"
 }
 
-_unittest_print_result_fail() {
-  local source lineno
-  local failure_location failure_detail
+######################################################################
+# Given the source file and the line number which assertion raised,
+# return a string formed as a certain format.
+# Globals:
+#   None
+# Arguments:
+#   Source file, a path,
+#   Line number, an integar.
+# Outputs:
+#   A string formed as "(in test file <filename>, line <line no.>)"
+######################################################################
+_unittest_get_failure_location() {
+  if (( $# != 2 )); then
+    error "Take exactly 2 arguments, but provided $#" true 1
+    return 1
+  fi
 
-  printf "%s ✗ %s%s\n" "$red" "$(_unittest_describe)" "$reset"
+  local source="$1"
+  local lineno="$2"
+  printf "(in test file %s, line %d)" "$source" "$lineno"
+}
+
+######################################################################
+# Given the source file and the line number which assertion raised,
+# return that line.
+# Globals:
+#   None
+# Arguments:
+#   Source file, a path,
+#   Line number, an integar.
+# Outputs:
+#   A line specified by the arguments.
+######################################################################
+_unittest_get_failure_detail() {
+  if (( $# != 2 )); then
+    error "Take exactly 2 arguments, but provided $#" true 1
+    return 1
+  fi
+
+  local source="$1"
+  local lineno="$2"
+  sed -e "${lineno}q;d" "$source" | sed -e "s/^[[:space:]]*//"
+}
+
+_unittest_print_result_fail() {
+  local source
+  local lineno
+  local status
+  local location
+  local detail
+
+  printcolln 1 " ✗ $(_unittest_describe)"
   for i in "${!unittest_err_status[@]}"; do
     source="${unittest_err_source[$i]}"
     lineno="${unittest_err_lineno[$i]}"
-    failure_location="$(printf "test file %s, line %d" "$source" "$lineno")"
-    failure_detail="$(sed -e "${lineno}q;d" "$source" | sed -e "s/^[[:space:]]*//")"
-    printf "%s   (in %s)\n     \`%s' failed with %d%s\n"\
-           "$brightred" "$failure_location" "$failure_detail" \
-           "${unittest_err_status[$i]}" "$reset"
+    status="${unittest_err_status[$i]}"
+    location="$(_unittest_get_failure_location "$source" "$lineno")"
+    detail="$(_unittest_get_failure_detail "$source" "$lineno")"
+    printcolln 9 "   $location"
+    printcolln 9 "     \`$detail' failed with $status"
   done
 }
 
