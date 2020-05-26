@@ -120,6 +120,59 @@ testcase_error_in_run() {
   [ "$output" = "$expected" ]
 }
 
+testcase_printcolln_error() {
+  describe "printcolln should raise an error when arguments are invalid"
+
+  local lineno
+  local prefix
+  local expected
+
+  # wrong number of arguments
+  lineno="$(grep -n "run printcolln \"error message\"\$" "$0" | cut -d':' -f1)"
+  prefix="$0:$lineno [in ${FUNCNAME[0]}()] "
+  expected="Take exactly 2 arguments, but provided 1"
+  run printcolln "error message"
+  [ $status = 1 ]
+  [ "$output" = "$prefix$expected" ]
+
+  # wrong color code
+  lineno="$(grep -n "run printcolln 256 \"text\"\$" "$0" | cut -d':' -f1)"
+  prefix="$0:$lineno [in ${FUNCNAME[0]}()] "
+  expected="The color code 256 is not supported, provide between 0-255"
+  run printcolln 256 "text"
+  [ $status = 1 ]
+  [ "$output" = "$prefix$expected" ]
+
+  # not an integar
+  lineno="$(grep -n "run printcolln red \"red text\"\$" "$0" | cut -d':' -f1)"
+  prefix="$0:$lineno [in ${FUNCNAME[0]}()] "
+  expected="Provide an integar as the first argument instead of 'red'"
+  run printcolln red "red text"
+  [ $status = 1 ]
+  [ "$output" = "$prefix$expected" ]
+}
+
+testcase_printcolln() {
+  describe "printcolln should print a line in a specified color"
+
+  local color
+  local reset
+  local expected
+  reset="$(tput sgr0)"
+
+  # red
+  color="$(tput setaf 1)"
+  expected="this is red"
+  run printcolln 1 "$expected"
+  [ "$output" = "$color$expected$reset" ]
+
+  # bright red
+  color="$(tput setaf 9)"
+  expected="this is bright red"
+  run printcolln 9 "$expected"
+  [ "$output" = "$color$expected$reset" ]
+}
+
 testcase_endswith_return_0() {
   describe "should return 0 if the word ends with the suffix"
 

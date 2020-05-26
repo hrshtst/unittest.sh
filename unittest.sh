@@ -253,6 +253,44 @@ error() {
 }
 
 ######################################################################
+# Print a colored line in the terminal.
+# Globasl:
+#   None
+# Arguments:
+#   Color code, an integar between 0-255.
+#   A string to print.
+# Outputs:
+#   Text to the standard error.
+######################################################################
+printcolln() {
+  if (( $# != 2 )); then
+    error "Take exactly 2 arguments, but provided $#" true 1
+    return 1
+  fi
+
+  declare -i code
+  local regex="^[0-9]+$"
+  if [[ "$1" =~ $regex ]]; then
+    code=$1; shift
+  else
+    error "Provide an integar as the first argument instead of '$1'"\
+          true 1
+    return 1
+  fi
+
+  declare -i colors
+  colors=$(tput colors)
+  if (( $code < 0 || $code >= $colors )); then
+    error "The color code $code is not supported, provide between 0-$(( colors - 1 ))"\
+          true 1
+    return 1
+  fi
+
+  local text="$*"
+  printf "$(tput setaf $code)%s$(tput sgr0)\n" "$text"
+}
+
+######################################################################
 # Return True if the string ends with the specified suffix, otherwise
 # return False.
 # Globals:
