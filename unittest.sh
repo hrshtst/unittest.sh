@@ -280,14 +280,14 @@ printcolln() {
 
   declare -i colors
   colors=$(tput colors)
-  if (( $code < 0 || $code >= $colors )); then
+  if (( code < 0 || code >= colors )); then
     error "The color code $code is not supported, provide between 0-$(( colors - 1 ))"\
           true 1
     return 1
   fi
 
   local text="$*"
-  printf "$(tput setaf $code)%s$(tput sgr0)\n" "$text"
+  printf "$(tput setaf "$code")%s$(tput sgr0)\n" "$text"
 }
 
 ######################################################################
