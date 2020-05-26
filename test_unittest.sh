@@ -107,6 +107,19 @@ testcase_error_inside_function() {
   [ "$_output" = "$expected" ]
 }
 
+testcase_error_in_run() {
+  describe "error" \
+           "should output an error message executed in run command"
+
+  local lineno
+  local expected
+
+  lineno="$(grep -n "run error_inside\$" "$0" | cut -d':' -f1)"
+  run error_inside
+  expected="$0:$lineno [in testcase_error_in_run()] error message inside a function"
+  [ "$output" = "$expected" ]
+}
+
 testcase_endswith_return_0() {
   describe "should return 0 if the word ends with the suffix"
 
@@ -201,6 +214,7 @@ testcase_initialize() {
   unittest_flag_help=true
   unittest_flag_list=true
   unittest_flag_force=true
+  unittest_flag_in_run=true
   # When the function is called,
   unittest_initialize
   # Then they are initialized.
@@ -215,6 +229,7 @@ testcase_initialize() {
   [ $unittest_flag_help = false ]
   [ $unittest_flag_list = false ]
   [ $unittest_flag_force = false ]
+  [ $unittest_flag_in_run = false ]
 }
 
 testcase_reset_vars() {

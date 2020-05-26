@@ -128,6 +128,9 @@ unittest_flag_list=false
 # Flag to force to run tests specified as skipped.
 unittest_flag_force=false
 
+# Flag to check if a command is executed in the `run` command.
+unittest_flag_in_run=false
+
 
 ### Global variables which store test case names and manage their
 ### results.
@@ -236,8 +239,12 @@ error() {
   local source
   local msg="${1}"
   local show_info="${2:-true}"
-  local frame="${3:-0}"
+  declare -i frame
+  frame=${3:-0}
 
+  if [[ $unittest_flag_in_run = true ]]; then
+    (( frame++ ))
+  fi
   if [[ $show_info = true ]]; then
     read -r lineno funcname source <<< "$(caller $frame)"
     msg="$source:$lineno [in $funcname()] $msg"
@@ -349,6 +356,7 @@ unittest_initialize() {
   unittest_flag_help=false
   unittest_flag_list=false
   unittest_flag_force=false
+  unittest_flag_in_run=false
 }
 
 ######################################################################
@@ -835,10 +843,12 @@ run() {
                "$source" "$lineno" "$cmd"
     return 1
   else
+    unittest_flag_in_run=true
     output="$($cmd "$@" 2>&1)"
     status=$?
     mapfile -t lines < <(echo "$output")
   fi
+  unittest_flag_in_run=false
   return 0
 }
 
