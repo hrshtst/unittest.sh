@@ -569,6 +569,33 @@ unittest_collect_testcases() {
 }
 
 ######################################################################
+# Return the index of the array `unittest_all_descriptions` whose
+# value is the supplied description.
+# Globals:
+#   unittest_all_descriptions
+# Arguments:
+#   Description of a test case, a string.
+# Outputs:
+#   The index or a null character to the standard output.
+######################################################################
+_unittest_get_index_by_description() {
+  if (( $# == 0 )); then
+    error "No descriptions provided"
+  fi
+
+  local description="$1"
+  local index=
+  local found=false
+  for index in "${!unittest_all_descriptions[@]}"; do
+    if [[ "$description" == "${unittest_all_descriptions[$index]}" ]]; then
+      found=true
+      break
+    fi
+  done
+  [[ "$found" == true  ]] && echo "$index"
+}
+
+######################################################################
 # Set up variables to store the result of a test case. Make them back
 # to their default values. This function should be executed prior to
 # running each test.
@@ -597,32 +624,6 @@ unittest_setup() {
   status=0
   output=
   lines=()
-}
-
-######################################################################
-# Return the index of the array `unittest_all_descriptions` whose
-# value is the supplied description.
-# Globals:
-#   unittest_all_descriptions
-# Arguments:
-#   Description of a test case, a string.
-# Outputs:
-#   The index or a null character to the standard output.
-######################################################################
-_unittest_get_index_from_description() {
-  if (( $# == 0 )); then
-    error "No descriptions provided"
-  fi
-
-  local desc="$1"
-  local index=
-  local found=false
-  for index in "${!unittest_all_descriptions[@]}"; do
-    if [[ "$desc" == "${unittest_all_descriptions[$index]}" ]]; then
-      found=true
-    fi
-  done
-  [[ "$found" == true  ]] && echo "$index"
 }
 
 ######################################################################
