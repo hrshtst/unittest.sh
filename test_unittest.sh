@@ -271,7 +271,7 @@ testcase_errtrap() {
 }
 
 testcase_initialize() {
-  describe "should initialize variables used throughout running tests"
+  describe "initialize should initialize variables used throughout running tests"
 
   # Given that fake values are assigned,
   unittest_all_tests=("testcase_dummy")
