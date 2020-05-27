@@ -379,6 +379,57 @@ testcase_parse_flags_positional_args() {
   [ "${unittest_specified_tests[1]}" = "test 02" ]
 }
 
+testcase_collect_testcases_check_num() {
+  describe "should check the number of collected testcases"
+
+  local n_testcases
+  n_testcases="$(grep -e "^testcase_.*() {$" "$0" | wc -l)"
+
+  [ "${#unittest_all_tests[@]}" = "$n_testcases" ]
+  [ "${#unittest_all_descriptions[@]}" = "$n_testcases" ]
+}
+
+testcase_collect_testcases_dummy01() {
+  describe "this is a dummy test"
+}
+
+testcase_collect_testcases_dummy02() {
+  describe 'this is a dummy test which has a so so so so loooooooooong description'\
+           'that it does not fit into one line'
+}
+
+testcase_collect_testcases_dummy03() {
+  describe ""
+}
+
+testcase_collect_testcases_dummy04() {
+  describe
+}
+
+testcase_collect_testcases_dummy05() {
+  :
+}
+
+# testcase_collect_testcases_check_map() {
+#   describe "should check if the created map stores keys and values correctly"
+
+#   local key="this is a dummy test"
+#   [ "${unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy01" ]
+
+#   key='this is a dummy test which has a so so so so loooooooooong description that it does not fit into one line'
+#   [ "${unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy02" ]
+
+#   # When no description is provided, the key should be its function name
+#   key="testcase_collect_testcases_dummy03"
+#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
+
+#   key="testcase_collect_testcases_dummy04"
+#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
+
+#   key="testcase_collect_testcases_dummy05"
+#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
+# }
+
 testcase_setup() {
   describe "should reset variables to their defaults"
   reserved_description=$unittest_description
@@ -656,56 +707,5 @@ testcase_print_result_skip() {
   [ "${lines[0]}" =\
     " - should print the result for a skipped test case (skipped: this is skipped)" ]
 }
-
-testcase_collect_testcases_check_num() {
-  describe "should check the number of collected testcases"
-
-  local n_testcases
-  n_testcases="$(grep -e "^testcase_.*() {$" "$0" | wc -l)"
-
-  [ "${#unittest_all_tests[@]}" = "$n_testcases" ]
-  [ "${#unittest_all_descriptions[@]}" = "$n_testcases" ]
-}
-
-testcase_collect_testcases_dummy01() {
-  describe "this is a dummy test"
-}
-
-testcase_collect_testcases_dummy02() {
-  describe 'this is a dummy test which has a so so so so loooooooooong description'\
-           'that it does not fit into one line'
-}
-
-testcase_collect_testcases_dummy03() {
-  describe ""
-}
-
-testcase_collect_testcases_dummy04() {
-  describe
-}
-
-testcase_collect_testcases_dummy05() {
-  :
-}
-
-# testcase_collect_testcases_check_map() {
-#   describe "should check if the created map stores keys and values correctly"
-
-#   local key="this is a dummy test"
-#   [ "${unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy01" ]
-
-#   key='this is a dummy test which has a so so so so loooooooooong description that it does not fit into one line'
-#   [ "${unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy02" ]
-
-#   # When no description is provided, the key should be its function name
-#   key="testcase_collect_testcases_dummy03"
-#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
-
-#   key="testcase_collect_testcases_dummy04"
-#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
-
-#   key="testcase_collect_testcases_dummy05"
-#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
-# }
 
 unittest_main "$@"

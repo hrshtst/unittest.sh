@@ -511,6 +511,29 @@ unittest_list_tests() {
 }
 
 ######################################################################
+# Collects functions whose names begin with `testcase_` and their
+# descriptions provided by the user. Function names and descriptions
+# are stored in global variables `unittest_all_tests` and
+# `unittest_all_descriptions`, respectively.
+# Globals:
+#   unittest_all_tests
+#   unittest_all_descriptions
+# Arguments:
+#   None
+######################################################################
+unittest_collect_testcases() {
+  local regex_find_testcase="^testcase_.*"
+  local _func=
+  local _desc=
+
+  while IFS= read -r _func; do
+    _desc="$(_unittest_extract_description "$_func")"
+    unittest_all_tests+=("$_func")
+    unittest_all_descriptions+=("$_desc")
+  done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_find_testcase")
+}
+
+######################################################################
 # Set up variables to store the result of a test case. Make them back
 # to their default values. This function should be executed prior to
 # running each test.
@@ -600,29 +623,6 @@ _unittest_get_index_from_description() {
     fi
   done
   [[ "$found" == true  ]] && echo "$index"
-}
-
-######################################################################
-# Collects functions whose names begin with `testcase_` and their
-# descriptions provided by the user. Function names and descriptions
-# are stored in global variables `unittest_all_tests` and
-# `unittest_all_descriptions`, respectively.
-# Globals:
-#   unittest_all_tests
-#   unittest_all_descriptions
-# Arguments:
-#   None
-######################################################################
-unittest_collect_testcases() {
-  local regex_find_testcase="^testcase_.*"
-  local _func=
-  local _desc=
-
-  while IFS= read -r _func; do
-    _desc="$(_unittest_extract_description "$_func")"
-    unittest_all_tests+=("$_func")
-    unittest_all_descriptions+=("$_desc")
-  done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_find_testcase")
 }
 
 ######################################################################
