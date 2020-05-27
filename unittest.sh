@@ -511,6 +511,41 @@ unittest_list_tests() {
 }
 
 ######################################################################
+# Extract a description from a definition of a test case function. If
+# no description is provided or it is invalid, returns its test case
+# function name.
+# Globals:
+#   None
+# Arguments:
+#   A test case function, a string.
+# Outputs:
+#   A string which is provided as a description or the function name
+#   to the standard output.
+######################################################################
+_unittest_extract_description() {
+  local funcname="$1"
+  local regex_find_desc="^[[:space:]]\+describe.*"
+  local sed_remove_quote="s/[\"';]//g"
+  local sed_find_desc="s/^[[:space:]]\+describe \(.*\)/\1/p"
+  local lineno
+  local description
+
+  # Find lines which contains `describe` at the beginning.
+  lineno="$(declare -f "$funcname" | grep -e "$regex_find_desc")"
+  # Choose only the last one.
+  lineno="$(echo "$lineno" | tail -1)"
+  # Extract the description
+  description="$(echo "$lineno" | sed -e "$sed_remove_quote" | sed -n "$sed_find_desc")"
+
+  # Output to the standard output.
+  if [[ -n "$description" ]]; then
+    echo "$description"
+  else
+    echo "$funcname"
+  fi
+}
+
+######################################################################
 # Collects functions whose names begin with `testcase_` and their
 # descriptions provided by the user. Function names and descriptions
 # are stored in global variables `unittest_all_tests` and
@@ -523,13 +558,13 @@ unittest_list_tests() {
 ######################################################################
 unittest_collect_testcases() {
   local regex_find_testcase="^testcase_.*"
-  local _func=
-  local _desc=
+  local funcname
+  local description
 
-  while IFS= read -r _func; do
-    _desc="$(_unittest_extract_description "$_func")"
-    unittest_all_tests+=("$_func")
-    unittest_all_descriptions+=("$_desc")
+  while IFS= read -r funcname; do
+    description="$(_unittest_extract_description "$funcname")"
+    unittest_all_tests+=("$funcname")
+    unittest_all_descriptions+=("$description")
   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_find_testcase")
 }
 
@@ -562,41 +597,6 @@ unittest_setup() {
   status=0
   output=
   lines=()
-}
-
-######################################################################
-# Extract a description from a definition of a test case function. If
-# no description is provided or it is invalid, returns its test case
-# function name.
-# Globals:
-#   None
-# Arguments:
-#   A test case function, a string.
-# Outputs:
-#   A string which is provided as a description or the function name
-#   to the standard output.
-######################################################################
-_unittest_extract_description() {
-  local _func="$1"
-  local regex_find_desc="^[[:space:]]\+describe.*"
-  local sed_remove_quote="s/[\"';]//g"
-  local sed_find_desc="s/^[[:space:]]\+describe \(.*\)/\1/p"
-  local _line=
-  local _desc=
-
-  # Find lines which contains `describe` at the beginning.
-  _line="$(declare -f "$_func" | grep -e "$regex_find_desc")"
-  # Choose only the last one.
-  _line="$(echo "$_line" | tail -1)"
-  # Extract the description
-  _desc="$(echo "$_line" | sed -e "$sed_remove_quote" | sed -n "$sed_find_desc")"
-
-  # Output to the standard output.
-  if [[ -n "$_desc" ]]; then
-    echo "$_desc"
-  else
-    echo "$_func"
-  fi
 }
 
 ######################################################################

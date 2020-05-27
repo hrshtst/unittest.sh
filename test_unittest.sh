@@ -380,10 +380,11 @@ testcase_parse_flags_positional_args() {
 }
 
 testcase_collect_testcases_check_num() {
-  describe "should check the number of collected testcases"
+  describe "unittest_collect_testcases"\
+           "should check the number of collected test cases"
 
   local n_testcases
-  n_testcases="$(grep -e "^testcase_.*() {$" "$0" | wc -l)"
+  n_testcases="$(grep -c "^testcase_.*() {$" "$0")"
 
   [ "${#unittest_all_tests[@]}" = "$n_testcases" ]
   [ "${#unittest_all_descriptions[@]}" = "$n_testcases" ]
