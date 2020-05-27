@@ -506,7 +506,7 @@ unittest_list_tests() {
   for index in "${!unittest_all_tests[@]}"; do
     func="${unittest_all_tests[$index]}"
     desc="${unittest_all_descriptions[$index]}"
-    printf "%2d: %s: %s\n" "$index" "$func" "$desc"
+    printf "%2d: %s (%s)\n" "$index" "$desc" "$func"
   done
 }
 
