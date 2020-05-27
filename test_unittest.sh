@@ -271,7 +271,8 @@ testcase_errtrap() {
 }
 
 testcase_initialize() {
-  describe "initialize should initialize variables used throughout running tests"
+  describe "unittest_initialize"\
+           "should initialize variables used throughout running tests"
 
   # Given that fake values are assigned,
   unittest_all_tests=("testcase_dummy")
@@ -311,7 +312,8 @@ _testcase_parse_flags_setup() {
 }
 
 testcase_parse_flags_help() {
-  describe "should set flags to show help message"
+  describe "unittest_parse"\
+           "should set flags to show help message"
 
   _testcase_parse_flags_setup
   unittest_parse -h
@@ -323,7 +325,8 @@ testcase_parse_flags_help() {
 }
 
 testcase_parse_flags_list() {
-  describe "should set flags to list available tests"
+  describe "unittest_parse"\
+           "should set flags to list available tests"
 
   _testcase_parse_flags_setup
   unittest_parse -l
@@ -335,7 +338,8 @@ testcase_parse_flags_list() {
 }
 
 testcase_parse_flags_force() {
-  describe "should set flags to force to run skipping tests"
+  describe "unittest_parse"\
+           "should set flags to force to run skipping tests"
 
   _testcase_parse_flags_setup
   unittest_parse -f
@@ -347,7 +351,8 @@ testcase_parse_flags_force() {
 }
 
 testcase_parse_flags_unsupported() {
-  describe "should throw an error if unsupported option is supplied"
+  describe "unittest_parse"\
+           "should throw an error if unsupported option is supplied"
 
   _testcase_parse_flags_setup
   run unittest_parse -a
@@ -361,7 +366,8 @@ testcase_parse_flags_unsupported() {
 }
 
 testcase_parse_flags_positional_args() {
-  describe "should store positional arguments to a variable"
+  describe "unittest_parse"\
+           "should store positional arguments to a variable"
 
   unittest_parse "should test something" "should check an awesome thing"
   [ "${unittest_specified_tests[0]}" = "should test something" ]
