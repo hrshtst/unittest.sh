@@ -418,7 +418,7 @@ unittest_initialize() {
 }
 
 ######################################################################
-# Reset variables which store the result and attributes of each test
+# Set up variables to store the result of a test case. Make them back
 # to their default values. This function should be executed prior to
 # running each test.
 # Globals:
@@ -429,10 +429,13 @@ unittest_initialize() {
 #   unittest_err_source
 #   unittest_err_lineno
 #   unittest_err_status
+#   status
+#   output
+#   lines
 # Arguments:
 #   None
 ######################################################################
-unittest_reset_vars() {
+unittest_setup() {
   unittest_description=
   unittest_skip_note=
   unittest_failed=false
@@ -581,7 +584,7 @@ _unittest_preprocesses() {
   # set the function name of the current test case
   unittest_testcase="$1"
   # reset variables
-  unittest_reset_vars
+  unittest_setup
   if [[ "$unittest_flag_force" = false ]]; then
     # handle a skipped test
     _unittest_handle_skipped_test "$unittest_testcase"
@@ -739,17 +742,6 @@ _unittest_print_result() {
 }
 
 ### Core functions
-
-######################################################################
-# Set up stuff to run tests.
-# Globals:
-#   None
-# Arguments:
-#   None
-######################################################################
-unittest_setup() {
-  unittest_initialize
-}
 
 ######################################################################
 # Show help message to the standard output.
@@ -987,7 +979,7 @@ skip() {
 #   Command arguments.
 ######################################################################
 unittest_main() {
-  unittest_setup
+  unittest_initialize
   unittest_parse "$@"
   if [[ "$unittest_flag_help" = true ]]; then
     unittest_help

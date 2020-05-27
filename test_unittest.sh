@@ -303,7 +303,7 @@ testcase_initialize() {
   [ $unittest_flag_in_run = false ]
 }
 
-testcase_reset_vars() {
+testcase_setup() {
   describe "should reset variables to their defaults"
   reserved_description=$unittest_description
 
@@ -319,7 +319,7 @@ testcase_reset_vars() {
   output="hoge"
   lines=("hoge" "fuga" "foo")
   # When the variables are reset,
-  unittest_reset_vars
+  unittest_setup
   # Then they are set to their defaults.
   [ -z $unittest_description ]
   [ -z $unittest_skip_note ]
