@@ -110,7 +110,7 @@ trap unittest_errtrap ERR
 ### Global variables used throughout running the test script.
 
 # Contains a filename of the test script.
-unittest_script_filename="${BASH_SOURCE[1]}"
+readonly unittest_script_filename="${BASH_SOURCE[1]}"
 
 # Contains the working directory to run the script. Its default value
 # is the current working directory.
