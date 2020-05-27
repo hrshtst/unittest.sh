@@ -360,6 +360,31 @@ pluralize() {
 #   are not tested in the script.
 
 ######################################################################
+# This function is executed when ERR signal is caught, which turns the
+# flag that the test case is failed on and store the source file, the
+# location and the status code where the ERR signal has been sent.
+# Globals:
+#   unittest_failed
+#   unittest_err_source
+#   unittest_err_lineno
+#   unittest_err_status
+# Arguments:
+#   None
+######################################################################
+unittest_errtrap() {
+  # Keep the exit status returned by the last function or command.
+  local _status="$?"
+
+  # Check if ERR signal is sent from the test script.
+  if [[ "${BASH_SOURCE[1]}" = "$unittest_script_filename" ]]; then
+    unittest_failed=true
+    unittest_err_source+=("${BASH_SOURCE[1]}")
+    unittest_err_lineno+=("${BASH_LINENO[0]}")
+    unittest_err_status+=("$_status")
+  fi
+}
+
+######################################################################
 # Initialize global variables listed below which are used throughout
 # running all tests.
 # Globals:
@@ -390,31 +415,6 @@ unittest_initialize() {
   unittest_flag_list=false
   unittest_flag_force=false
   unittest_flag_in_run=false
-}
-
-######################################################################
-# Executed when ERR signal is caught. Turn the failed flag on and
-# store the source file, the location and the status code where the
-# ERR signal has been sent.
-# Globals:
-#   unittest_failed
-#   unittest_err_source
-#   unittest_err_lineno
-#   unittest_err_status
-# Arguments:
-#   None
-######################################################################
-unittest_errtrap() {
-  # Keep the exit status returned by the last function or command.
-  local _status="$?"
-
-  # Check if ERR signal is sent from the test script.
-  if [[ "${BASH_SOURCE[1]}" = "$unittest_script_filename" ]]; then
-    unittest_failed=true
-    unittest_err_source+=("${BASH_SOURCE[1]}")
-    unittest_err_lineno+=("${BASH_LINENO[0]}")
-    unittest_err_status+=("$_status")
-  fi
 }
 
 ######################################################################

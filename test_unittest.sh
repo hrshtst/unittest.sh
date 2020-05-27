@@ -252,6 +252,24 @@ teardown() {
   copy_array reserved_skipped_tests unittest_skipped_tests
 }
 
+mock_send_err() {
+  return 123
+}
+
+testcase_errtrap() {
+  describe "errtrap should trigger failed flag when ERR is sent"
+
+  local lineno
+  lineno="$(grep -ne "^  mock_send_err\$" "$0" | cut -d':' -f1)"
+
+  mock_send_err
+  [ "$unittest_failed" = true ]
+  [ "${unittest_err_source[0]}" = "$0" ]
+  [ "${unittest_err_lineno[0]}" = "$lineno" ]
+  [ "${unittest_err_status[0]}" = "123" ]
+  unittest_failed=false
+}
+
 testcase_initialize() {
   describe "should initialize variables used throughout running tests"
 
