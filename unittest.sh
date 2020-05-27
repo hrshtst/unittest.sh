@@ -627,6 +627,13 @@ _unittest_postprocesses() {
   _unittest_categorize_by_result "$testcase"
 }
 
+######################################################################
+# Print the description of a test that is passed.
+# Globals:
+#   None
+# Arguments:
+#   None
+######################################################################
 _unittest_print_result_pass() {
   printf " ✓ %s\n" "$(_unittest_describe)"
 }
@@ -675,6 +682,13 @@ _unittest_get_failure_detail() {
   sed -e "${lineno}q;d" "$source" | sed -e "s/^[[:space:]]*//"
 }
 
+######################################################################
+# Print the description of a test that is failed and its description.
+# Globals:
+#   None
+# Arguments:
+#   None
+######################################################################
 _unittest_print_result_fail() {
   local source
   local lineno
@@ -694,12 +708,26 @@ _unittest_print_result_fail() {
   done
 }
 
+######################################################################
+# Print the description of a test that is skipped.
+# Globals:
+#   None
+# Arguments:
+#   None
+######################################################################
 _unittest_print_result_skip() {
   local skip_note
   skip_note="${unittest_skip_note:+: }${unittest_skip_note}"
   printf " - %s (skipped%s)\n" "$(_unittest_describe)" "$skip_note"
 }
 
+######################################################################
+# Print the result of each test case.
+# Globals:
+#   None
+# Arguments:
+#   None
+######################################################################
 _unittest_print_result() {
   if [[ $unittest_skipped = true ]]; then
     _unittest_print_result_skip
