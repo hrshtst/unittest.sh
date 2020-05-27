@@ -418,6 +418,99 @@ unittest_initialize() {
 }
 
 ######################################################################
+# Parse command line arguments.
+# Globals:
+#   None
+# Arguments:
+#   Command line arguments
+######################################################################
+unittest_parse() {
+  local testspecs=()
+  local param=
+
+  while (( $# )); do
+    param="$1"
+    case "$param" in
+      -l|--list-tests)
+        unittest_flag_list=true
+        shift
+        ;;
+      -f|--force-run)
+        unittest_flag_force=true
+        shift
+        ;;
+      -h|--help)
+        unittest_flag_help=true
+        shift
+        ;;
+      -*)
+        error "$0: unsupported option: $param" false
+        return 1
+        shift
+        ;;
+      *)
+        testspecs+=("$param")
+        shift
+        ;;
+    esac
+  done
+
+  set -- "${testspecs[@]}"
+  unittest_specified_tests=("${testspecs[@]}")
+}
+
+######################################################################
+# Show help message to the standard output.
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Help message to the stdout.
+######################################################################
+unittest_help() {
+  cat <<- EOT
+Run unit tests defined in \`${unittest_script_filename#./}' and print
+the result of each test case and the summary.
+
+Usage: $0 [-l] [-f] [-h] <test-spec> ...
+
+<test-spec> ...     Specify which tests to run. Given no test specs
+                    supplied all test cases are run.
+-l, --list-tests    List available tests.
+-f, --force-run     Force to run tests including skipping ones.
+-h, --help          Print this message.
+
+Notice for test specs:
+Test specs must be enclosed in quotes if they contain spaces. They are
+case insensitive. A wildcard charcter, namely *, can substitue for any
+number of any characters.
+
+EOT
+}
+
+######################################################################
+# Show the list of available tests.
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   List of available tests to stdout.
+######################################################################
+unittest_list_tests() {
+  local index=
+  local func=
+  local desc=
+  printf "%d tests found\n" "${#unittest_all_tests[@]}"
+  for index in "${!unittest_all_tests[@]}"; do
+    func="${unittest_all_tests[$index]}"
+    desc="${unittest_all_descriptions[$index]}"
+    printf "%2d: %s: %s\n" "$index" "$func" "$desc"
+  done
+}
+
+######################################################################
 # Set up variables to store the result of a test case. Make them back
 # to their default values. This function should be executed prior to
 # running each test.
@@ -742,99 +835,6 @@ _unittest_print_result() {
 }
 
 ### Core functions
-
-######################################################################
-# Show help message to the standard output.
-# Globals:
-#   None
-# Arguments:
-#   None
-# Outputs:
-#   Help message to the stdout.
-######################################################################
-unittest_help() {
-  cat <<- EOT
-Run unit tests defined in \`${unittest_script_filename#./}' and print
-the result of each test case and the summary.
-
-Usage: $0 [-l] [-f] [-h] <test-spec> ...
-
-<test-spec> ...     Specify which tests to run. Given no test specs
-                    supplied all test cases are run.
--l, --list-tests    List available tests.
--f, --force-run     Force to run tests including skipping ones.
--h, --help          Print this message.
-
-Notice for test specs:
-Test specs must be enclosed in quotes if they contain spaces. They are
-case insensitive. A wildcard charcter, namely *, can substitue for any
-number of any characters.
-
-EOT
-}
-
-######################################################################
-# Show the list of available tests.
-# Globals:
-#   None
-# Arguments:
-#   None
-# Outputs:
-#   List of available tests to stdout.
-######################################################################
-unittest_list_tests() {
-  local index=
-  local func=
-  local desc=
-  printf "%d tests found\n" "${#unittest_all_tests[@]}"
-  for index in "${!unittest_all_tests[@]}"; do
-    func="${unittest_all_tests[$index]}"
-    desc="${unittest_all_descriptions[$index]}"
-    printf "%2d: %s: %s\n" "$index" "$func" "$desc"
-  done
-}
-
-######################################################################
-# Parse command line arguments.
-# Globals:
-#   None
-# Arguments:
-#   Command line arguments
-######################################################################
-unittest_parse() {
-  local testspecs=()
-  local param=
-
-  while (( $# )); do
-    param="$1"
-    case "$param" in
-      -l|--list-tests)
-        unittest_flag_list=true
-        shift
-        ;;
-      -f|--force-run)
-        unittest_flag_force=true
-        shift
-        ;;
-      -h|--help)
-        unittest_flag_help=true
-        shift
-        ;;
-      -*)
-        error "$0: unsupported option: $param" false
-        return 1
-        shift
-        ;;
-      *)
-        testspecs+=("$param")
-        shift
-        ;;
-    esac
-  done
-
-  set -- "${testspecs[@]}"
-  unittest_specified_tests=("${testspecs[@]}")
-}
 
 ######################################################################
 # Decide which testcases should be run.

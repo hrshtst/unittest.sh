@@ -303,6 +303,76 @@ testcase_initialize() {
   [ $unittest_flag_in_run = false ]
 }
 
+_testcase_parse_flags_setup() {
+  unittest_initialize
+  [ "$unittest_flag_help" = false ]
+  [ "$unittest_flag_list" = false ]
+  [ "$unittest_flag_force" = false ]
+}
+
+testcase_parse_flags_help() {
+  describe "should set flags to show help message"
+
+  _testcase_parse_flags_setup
+  unittest_parse -h
+  [ "$unittest_flag_help" = true ]
+
+  _testcase_parse_flags_setup
+  unittest_parse --help
+  [ "$unittest_flag_help" = true ]
+}
+
+testcase_parse_flags_list() {
+  describe "should set flags to list available tests"
+
+  _testcase_parse_flags_setup
+  unittest_parse -l
+  [ "$unittest_flag_list" = true ]
+
+  _testcase_parse_flags_setup
+  unittest_parse --list-tests
+  [ "$unittest_flag_list" = true ]
+}
+
+testcase_parse_flags_force() {
+  describe "should set flags to force to run skipping tests"
+
+  _testcase_parse_flags_setup
+  unittest_parse -f
+  [ "$unittest_flag_force" = true ]
+
+  _testcase_parse_flags_setup
+  unittest_parse --force-run
+  [ "$unittest_flag_force" = true ]
+}
+
+testcase_parse_flags_unsupported() {
+  describe "should throw an error if unsupported option is supplied"
+
+  _testcase_parse_flags_setup
+  run unittest_parse -a
+  [ "$status" -eq 1 ]
+  [ "$output" = "$0: unsupported option: -a" ]
+
+  _testcase_parse_flags_setup
+  run unittest_parse --unknown
+  [ "$status" -eq 1 ]
+  [ "$output" = "$0: unsupported option: --unknown" ]
+}
+
+testcase_parse_flags_positional_args() {
+  describe "should store positional arguments to a variable"
+
+  unittest_parse "should test something" "should check an awesome thing"
+  [ "${unittest_specified_tests[0]}" = "should test something" ]
+  [ "${unittest_specified_tests[1]}" = "should check an awesome thing" ]
+
+  unittest_parse -f "test 01" "test 02"
+  [ "$unittest_flag_force" = true ]
+  [ "${unittest_specified_tests[0]}" = "test 01" ]
+  [ "${unittest_specified_tests[1]}" = "test 02" ]
+}
+
 testcase_setup() {
   describe "should reset variables to their defaults"
   reserved_description=$unittest_description
@@ -579,76 +649,6 @@ testcase_print_result_skip() {
   run _unittest_print_result_skip
   [ "${lines[0]}" =\
     " - should print the result for a skipped test case (skipped: this is skipped)" ]
-}
-
-_testcase_parse_flags_setup() {
-  unittest_initialize
-  [ "$unittest_flag_help" = false ]
-  [ "$unittest_flag_list" = false ]
-  [ "$unittest_flag_force" = false ]
-}
-
-testcase_parse_flags_help() {
-  describe "should set flags to show help message"
-
-  _testcase_parse_flags_setup
-  unittest_parse -h
-  [ "$unittest_flag_help" = true ]
-
-  _testcase_parse_flags_setup
-  unittest_parse --help
-  [ "$unittest_flag_help" = true ]
-}
-
-testcase_parse_flags_list() {
-  describe "should set flags to list available tests"
-
-  _testcase_parse_flags_setup
-  unittest_parse -l
-  [ "$unittest_flag_list" = true ]
-
-  _testcase_parse_flags_setup
-  unittest_parse --list-tests
-  [ "$unittest_flag_list" = true ]
-}
-
-testcase_parse_flags_force() {
-  describe "should set flags to force to run skipping tests"
-
-  _testcase_parse_flags_setup
-  unittest_parse -f
-  [ "$unittest_flag_force" = true ]
-
-  _testcase_parse_flags_setup
-  unittest_parse --force-run
-  [ "$unittest_flag_force" = true ]
-}
-
-testcase_parse_flags_unsupported() {
-  describe "should throw an error if unsupported option is supplied"
-
-  _testcase_parse_flags_setup
-  run unittest_parse -a
-  [ "$status" -eq 1 ]
-  [ "$output" = "$0: unsupported option: -a" ]
-
-  _testcase_parse_flags_setup
-  run unittest_parse --unknown
-  [ "$status" -eq 1 ]
-  [ "$output" = "$0: unsupported option: --unknown" ]
-}
-
-testcase_parse_flags_positional_args() {
-  describe "should store positional arguments to a variable"
-
-  unittest_parse "should test something" "should check an awesome thing"
-  [ "${unittest_specified_tests[0]}" = "should test something" ]
-  [ "${unittest_specified_tests[1]}" = "should check an awesome thing" ]
-
-  unittest_parse -f "test 01" "test 02"
-  [ "$unittest_flag_force" = true ]
-  [ "${unittest_specified_tests[0]}" = "test 01" ]
-  [ "${unittest_specified_tests[1]}" = "test 02" ]
 }
 
 testcase_collect_testcases_check_num() {
