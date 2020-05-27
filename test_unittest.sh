@@ -31,7 +31,7 @@ copy_array() {
   type="$(echo "$repr" | cut -d' ' -f2)" # => -a
 
   # Unset a variable in case the variable name conflicts
-  unset -v $dst
+  unset -v "$dst"
 
   # NOTE: $dst is declared as a global variable to make it visible
   # outside from this function.
