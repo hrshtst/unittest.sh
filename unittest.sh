@@ -966,7 +966,7 @@ run() {
 skip() {
   [[ "$unittest_flag_force" = true ]] && return
 
-  unittest_skip_note="${1:-}"
+  unittest_skip_note="${*:-}"
   unittest_skipped=true
 }
 
