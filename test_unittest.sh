@@ -582,11 +582,12 @@ testcase_determine_tests_to_run_nonexistent_description() {
 }
 
 testcase_setup() {
-  describe "should reset variables to their defaults"
+  describe "unittest_setup"\
+           "should reset variables to their defaults"
   reserved_description=$unittest_description
 
   # Given that fake values are assigned,
-  unittest_description="testcase_dummy"
+  unittest_description="this is a dummy test"
   unittest_skip_note="skip the dummy test"
   unittest_failed=true
   unittest_skipped=true
@@ -594,20 +595,20 @@ testcase_setup() {
   unittest_err_lineno=("105")
   unittest_err_status=("1")
   status=1234
-  output="hoge"
-  lines=("hoge" "fuga" "foo")
+  output="very helpful message"
+  lines=("very helpful message" "comes from" "the universe")
   # When the variables are reset,
   unittest_setup
   # Then they are set to their defaults.
-  [ -z $unittest_description ]
-  [ -z $unittest_skip_note ]
+  [ -z "$unittest_description" ]
+  [ -z "$unittest_skip_note" ]
   [ $unittest_failed = false ]
   [ $unittest_skipped = false ]
   [ ${#unittest_err_source[@]} -eq 0 ]
   [ ${#unittest_err_lineno[@]} -eq 0 ]
   [ ${#unittest_err_status[@]} -eq 0 ]
-  [ $status -eq 0 ]
-  [ -z $output ]
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
   [ ${#lines[@]} -eq 0 ]
 
   unittest_description=$reserved_description

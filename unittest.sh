@@ -708,8 +708,9 @@ unittest_determine_tests_to_run() {
 
 ######################################################################
 # Set up variables to store the result of a test case. Make them back
-# to their default values. This function should be executed prior to
-# running each test.
+# to their default values. This function should be executed beforehand
+# per each test case.
+#
 # Globals:
 #   unittest_description
 #   unittest_skip_note
