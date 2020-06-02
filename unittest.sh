@@ -511,9 +511,10 @@ unittest_list_tests() {
 }
 
 ######################################################################
-# Extract a description from a definition of a test case function. If
-# no description is provided or it is invalid, returns its test case
+# Get a description from a definition of a test case function. If no
+# description is provided or it is invalid, returns its test case
 # function name.
+#
 # Globals:
 #   None
 # Arguments:
@@ -522,22 +523,24 @@ unittest_list_tests() {
 #   A string which is provided as a description or the function name
 #   to the standard output.
 ######################################################################
-_unittest_extract_description() {
+_unittest_get_description() {
   local funcname="$1"
-  local regex_find_desc="^[[:space:]]\+describe.*"
-  local sed_remove_quote="s/[\"';]//g"
-  local sed_find_desc="s/^[[:space:]]\+describe \(.*\)/\1/p"
-  local lineno
+  local regex="describe +(?:([\"'])\K.+(?=\1)|\K\b.+)"
+  local remove_quotes="s/[\"'][[:space:]]\+[\"']/ /g"
   local description
 
-  # Find lines which contains `describe` at the beginning.
-  lineno="$(declare -f "$funcname" | grep -e "$regex_find_desc")"
-  # Choose only the last one.
-  lineno="$(echo "$lineno" | tail -1)"
-  # Extract the description
-  description="$(echo "$lineno" | sed -e "$sed_remove_quote" | sed -n "$sed_find_desc")"
+  # Extracting the description from function definitions works like
+  # this: print the definition of the provided function, extract only
+  # matching with the regular expression pattern which is expressed as
+  # $regex and get the last one. The RegEx process can be seen in:
+  # https://regex101.com/r/aAxJnf/4
+  description="$(declare -f "$funcname" | grep -Po "$regex" | tail -1)"
 
-  # Output to the standard output.
+  # To handle cases where more than one arguments are provided, remove
+  # contiguous quotes.
+  description="$(echo "$description" | sed -e "$remove_quotes")"
+
+  # When the extracted text is empty just output the function name.
   if [[ -n "$description" ]]; then
     echo "$description"
   else
@@ -562,7 +565,7 @@ unittest_collect_testcases() {
   local description
 
   while IFS= read -r funcname; do
-    description="$(_unittest_extract_description "$funcname")"
+    description="$(_unittest_get_description "$funcname")"
     unittest_all_tests+=("$funcname")
     unittest_all_descriptions+=("$description")
   done < <(declare -F | cut -d' ' -f3 | grep -e "$regex_find_testcase")
@@ -584,15 +587,123 @@ _unittest_get_index_by_description() {
   fi
 
   local description="$1"
-  local index=
   local found=false
+  declare -i index
   for index in "${!unittest_all_descriptions[@]}"; do
     if [[ "$description" == "${unittest_all_descriptions[$index]}" ]]; then
       found=true
       break
     fi
   done
-  [[ "$found" == true  ]] && echo "$index"
+  [[ $found == false ]] && return 1
+  [[ $found == true  ]] && echo $index
+}
+
+######################################################################
+# Add provided index to the list of tests to run. When the provided
+# index is out of valid indeices, output an error message.
+#
+# Globals:
+#   unittest_tests_to_run
+# Arguments:
+#   An index, an integar
+######################################################################
+_unittest_add_index_to_tests_to_run() {
+  declare -i index
+  declare -i max
+
+  index=$1
+  max=${#unittest_all_tests[@]}
+
+  if (( index < 0 || index >= max )); then
+    error "Index $index is out of range. Provide between 0 to $(( max - 1 ))."\
+          true 2
+    return 1
+  fi
+  unittest_tests_to_run+=("${unittest_all_tests[$testspec]}")
+}
+
+######################################################################
+# Add provided function name to the list of tests to run. When the
+# provided function name is not found in collected test cases, output
+# an error message.
+#
+# Globals:
+#   unittest_tests_to_run
+# Arguments:
+#   Function name, a string
+######################################################################
+_unittest_add_funcname_to_tests_to_run() {
+  local funcname
+  local testcase
+
+  funcname="$1"
+  for testcase in "${unittest_all_tests[@]}"; do
+    if [[ "$testcase" = "$funcname" ]]; then
+      unittest_tests_to_run+=("$funcname")
+      return 0
+    fi
+  done
+  error "Function $funcname is not defined in $unittest_script_filename" true 2
+  return 1
+}
+
+######################################################################
+# Add provided description of a test name to the list of tests to run.
+# When the provided description is invalid, output an error message.
+#
+# Globals:
+#   unittest_tests_to_run
+# Arguments:
+#   Description of a test, a string
+######################################################################
+_unittest_add_description_to_tests_to_run() {
+  local pattern
+  local i
+  local description
+  local funcname
+
+  pattern="$1"
+  for i in "${!unittest_all_descriptions[@]}"; do
+    description="${unittest_all_descriptions[i]}"
+    # if [[ "$description" =~ $pattern ]]; then
+    if [[ "$description" = "$pattern" ]]; then
+      funcname="${unittest_all_tests[i]}"
+      unittest_tests_to_run+=("$funcname")
+      return 0
+    fi
+  done
+  error "No tests found with description: '$pattern'" true 2
+  return 1
+}
+
+######################################################################
+# Determine which test cases will be run.
+#
+# Globals:
+#   unittest_tests_to_run
+# Arguments:
+#   <testspecs>...
+#   <testspecs> is any of test description, test function name or
+#   index.
+######################################################################
+unittest_determine_tests_to_run() {
+  local testspec
+  local regex_is_index="^[0-9]+"
+  local regex_is_testcase="^testcase_.*"
+
+  for testspec in "$@"; do
+    if [[ "$testspec" =~ $regex_is_index ]]; then
+      _unittest_add_index_to_tests_to_run "$testspec" || return 1
+    elif [[ "$testspec" =~ $regex_is_testcase ]]; then
+      _unittest_add_funcname_to_tests_to_run "$testspec" || return 1
+    else
+      _unittest_add_description_to_tests_to_run "$testspec" || return 1
+    fi
+  done
+  if (( ${#unittest_tests_to_run[@]} == 0 )); then
+    unittest_tests_to_run=("${unittest_all_tests[@]}")
+  fi
 }
 
 ######################################################################

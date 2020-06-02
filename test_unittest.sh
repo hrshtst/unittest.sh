@@ -390,46 +390,196 @@ testcase_collect_testcases_check_num() {
   [ "${#unittest_all_descriptions[@]}" = "$n_testcases" ]
 }
 
-testcase_collect_testcases_dummy01() {
-  describe "this is a dummy test"
-}
-
-testcase_collect_testcases_dummy02() {
+testcase_long_description() {
   describe 'this is a dummy test which has a so so so so loooooooooong description'\
            'that it does not fit into one line'
 }
 
-testcase_collect_testcases_dummy03() {
+testcase_collect_testcases_handle_long_desciption() {
+  describe "unittest_collect_testcases"\
+           "should handle the case where a long description is supplied"
+
+  local key
+  local index
+
+  key='this is a dummy test which has a so so so so loooooooooong description that it does not fit into one line'
+  index="$(_unittest_get_index_by_description "$key")"
+
+  [ "${unittest_all_tests[$index]}" = "testcase_long_description" ]
+}
+
+testcase_description_has_zero_chars() {
   describe ""
 }
 
-testcase_collect_testcases_dummy04() {
+testcase_collect_testcases_handle_zero_chars() {
+  describe "unittest_collect_testcases"\
+           "should handle the case where the description has zero chars"
+
+  local key
+  local index
+
+  key="testcase_description_has_zero_chars"
+  index="$(_unittest_get_index_by_description "$key")"
+
+  [ "${unittest_all_tests[$index]}" = "testcase_description_has_zero_chars" ]
+}
+
+testcase_description_is_null() {
   describe
 }
 
-testcase_collect_testcases_dummy05() {
+testcase_collect_testcases_handle_null() {
+  describe "unittest_collect_testcases"\
+           "should handle the case where the description is null"
+
+  local key
+  local index
+
+  key="testcase_description_is_null"
+  index="$(_unittest_get_index_by_description "$key")"
+
+  [ "${unittest_all_tests[$index]}" = "testcase_description_is_null" ]
+}
+
+testcase_no_description() {
   :
 }
 
-# testcase_collect_testcases_check_map() {
-#   describe "should check if the created map stores keys and values correctly"
+testcase_collect_testcases_handle_no_description() {
+  describe "unittest_collect_testcases"\
+           "should handle the case where no description is supplied"
 
-#   local key="this is a dummy test"
-#   [ "${unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy01" ]
+  local key
+  local index
 
-#   key='this is a dummy test which has a so so so so loooooooooong description that it does not fit into one line'
-#   [ "${unittest_all_tests_map[$key]}" = "testcase_collect_testcases_dummy02" ]
+  key="testcase_no_description"
+  index="$(_unittest_get_index_by_description "$key")"
 
-#   # When no description is provided, the key should be its function name
-#   key="testcase_collect_testcases_dummy03"
-#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
+  [ "${unittest_all_tests[$index]}" = "testcase_no_description" ]
+}
 
-#   key="testcase_collect_testcases_dummy04"
-#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
+testcase_dummy() {
+  describe "Of course, I'm no dummy"
+}
 
-#   key="testcase_collect_testcases_dummy05"
-#   [ "${unittest_all_tests_map[$key]}" = "$key" ]
-# }
+testcase_idiot() {
+  describe "There's a village somewhere missing an idiot"
+}
+
+testcase_dumb() {
+  describe "I may be dumb, but I'm not stupid"
+}
+
+testcase_determine_tests_to_run_no_arguments() {
+  describe "unittest_determine_tests_to_run"\
+           "should make all tests run if no arguments are provided"
+
+  # Count number of all test cases.
+  local n_testcases
+  n_testcases="$(grep -c "^testcase_.*() {$" "$0")"
+  # Clear the output variable.
+  unittest_tests_to_run=()
+
+  # Execute the method to be tested.
+  unittest_determine_tests_to_run
+
+  # Check the result.
+  [ "${#unittest_tests_to_run[@]}" = "$n_testcases" ]
+}
+
+testcase_determine_tests_to_run_provide_index() {
+  describe "unittest_determine_tests_to_run"\
+           "should determine tests specified by indices as ones to run"
+
+  unittest_determine_tests_to_run 3 10 15
+
+  [ "${#unittest_tests_to_run[@]}" = 3 ]
+  [ "${unittest_tests_to_run[0]}" = "${unittest_all_tests[3]}" ]
+  [ "${unittest_tests_to_run[1]}" = "${unittest_all_tests[10]}" ]
+  [ "${unittest_tests_to_run[2]}" = "${unittest_all_tests[15]}" ]
+}
+
+testcase_determine_tests_to_run_invalid_index() {
+  describe "unittest_determine_tests_to_run"\
+           "should raise an error if an invalid index is provided"
+
+  local lineno
+  local prefix
+  local n_testcases
+  local msg
+
+  run unittest_determine_tests_to_run 999
+  lineno="$(grep -ne "^  run unittest_determine_tests_to_run 999" "$0" | cut -d':' -f1)"
+  prefix="$0:$lineno [in ${FUNCNAME[0]}()]"
+  n_testcases="$(grep -c "^testcase_.*() {$" "$0")"
+  msg="Index 999 is out of range. Provide between 0 to $(( n_testcases - 1 ))."
+
+  [ "$output" = "$prefix $msg" ]
+  [ "$status" = 1 ]
+}
+
+testcase_determine_tests_to_run_provide_funcname() {
+  describe "unittest_determine_tests_to_run"\
+           "should determine tests specified by function names as ones to run"
+
+  unittest_determine_tests_to_run "testcase_dummy"\
+                                  "testcase_idiot"\
+                                  "testcase_dumb"
+
+  [ "${#unittest_tests_to_run[@]}" = 3 ]
+  [ "${unittest_tests_to_run[0]}" = "testcase_dummy" ]
+  [ "${unittest_tests_to_run[1]}" = "testcase_idiot" ]
+  [ "${unittest_tests_to_run[2]}" = "testcase_dumb" ]
+}
+
+testcase_determine_tests_to_run_invalid_funcname() {
+  describe "unittest_determine_tests_to_run"\
+           "should raise an error if an invalid function name is provided"
+
+  local lineno
+  local prefix
+  local msg
+
+  run unittest_determine_tests_to_run "testcase_fool"
+  lineno="$(grep -ne "^  run unittest_determine_tests_to_run \"testcase_fool\"" "$0" | cut -d':' -f1)"
+  prefix="$0:$lineno [in ${FUNCNAME[0]}()]"
+  msg="Function testcase_fool is not defined in $0"
+
+  [ "$output" = "$prefix $msg" ]
+  [ "$status" = 1 ]
+}
+
+testcase_determine_tests_to_run_provide_description() {
+  describe "unittest_determine_tests_to_run"\
+           "should determine tests specified by descriptions as ones to run"
+
+  unittest_determine_tests_to_run "Of course, I'm no dummy"\
+                                  "There's a village somewhere missing an idiot"\
+                                  "I may be dumb, but I'm not stupid"
+
+  [ "${#unittest_tests_to_run[@]}" = 3 ]
+  [ "${unittest_tests_to_run[0]}" = "testcase_dummy" ]
+  [ "${unittest_tests_to_run[1]}" = "testcase_idiot" ]
+  [ "${unittest_tests_to_run[2]}" = "testcase_dumb" ]
+}
+
+testcase_determine_tests_to_run_nonexistent_description() {
+  describe "unittest_determine_tests_to_run"\
+           "should raise an error if non-existent description is provided"
+
+  local lineno
+  local prefix
+  local msg
+
+  run unittest_determine_tests_to_run "This is a non-existent test case"
+  lineno="$(grep -ne "^  run unittest_determine_tests_to_run \"This is a non-existent test case\"" "$0" | cut -d':' -f1)"
+  prefix="$0:$lineno [in ${FUNCNAME[0]}()]"
+  msg="No tests found with description: 'This is a non-existent test case'"
+
+  [ "$output" = "$prefix $msg" ]
+  [ "$status" = 1 ]
+}
 
 testcase_setup() {
   describe "should reset variables to their defaults"
@@ -579,6 +729,13 @@ testcase_describe() {
   [ "$(_unittest_describe)" = "testcase_describe" ]
 
   describe should store the description of the test case
+  [ "$(_unittest_describe)" = "$_desc" ]
+}
+
+testcase_describe_include_quote() {
+  local _desc="Let’s go invent tomorrow rather than worrying about what happened yesterday."
+
+  describe "$_desc"
   [ "$(_unittest_describe)" = "$_desc" ]
 }
 
