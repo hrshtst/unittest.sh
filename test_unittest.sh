@@ -7,6 +7,12 @@
 # shellcheck source=unittest.sh
 source unittest.sh
 
+### Count the number of test cases defined in this script by finding lines which begins with 'testcase_'. Then subtract one from the count because the function `testcase_double_definition` is defined twice on purpose.
+declare -i N_TESTCASES
+N_TESTCASES="$(grep -c "^testcase_.*() {$" "$0")"
+N_TESTCASES=$(( N_TESTCASES - 1 ))
+readonly N_TESTCASES
+
 
 ### Testing of methods used in this script privately.
 
@@ -383,11 +389,8 @@ testcase_collect_testcases_check_num() {
   describe "unittest_collect_testcases"\
            "should check the number of collected test cases"
 
-  local n_testcases
-  n_testcases="$(grep -c "^testcase_.*() {$" "$0")"
-
-  [ "${#unittest_all_tests[@]}" = "$n_testcases" ]
-  [ "${#unittest_all_descriptions[@]}" = "$n_testcases" ]
+  [ "${#unittest_all_tests[@]}" = "$N_TESTCASES" ]
+  [ "${#unittest_all_descriptions[@]}" = "$N_TESTCASES" ]
 }
 
 testcase_long_description() {
@@ -475,9 +478,6 @@ testcase_determine_tests_to_run_no_arguments() {
   describe "unittest_determine_tests_to_run"\
            "should make all tests run if no arguments are provided"
 
-  # Count number of all test cases.
-  local n_testcases
-  n_testcases="$(grep -c "^testcase_.*() {$" "$0")"
   # Clear the output variable.
   unittest_tests_to_run=()
 
@@ -485,7 +485,7 @@ testcase_determine_tests_to_run_no_arguments() {
   unittest_determine_tests_to_run
 
   # Check the result.
-  [ "${#unittest_tests_to_run[@]}" = "$n_testcases" ]
+  [ "${#unittest_tests_to_run[@]}" = "$N_TESTCASES" ]
 }
 
 testcase_determine_tests_to_run_provide_index() {
@@ -506,14 +506,12 @@ testcase_determine_tests_to_run_invalid_index() {
 
   local lineno
   local prefix
-  local n_testcases
   local msg
 
   run unittest_determine_tests_to_run 999
   lineno="$(grep -ne "^  run unittest_determine_tests_to_run 999" "$0" | cut -d':' -f1)"
   prefix="$0:$lineno [in ${FUNCNAME[0]}()]"
-  n_testcases="$(grep -c "^testcase_.*() {$" "$0")"
-  msg="Index 999 is out of range. Provide between 0 to $(( n_testcases - 1 ))."
+  msg="Index 999 is out of range. Provide between 0 to $(( N_TESTCASES - 1 ))."
 
   [ "$output" = "$prefix $msg" ]
   [ "$status" = 1 ]
