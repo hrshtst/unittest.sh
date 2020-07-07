@@ -131,6 +131,8 @@ unittest_flag_force=false
 # Flag to check if a command is executed in the `run` command.
 unittest_flag_in_run=false
 
+# Flag to check if raise an error when duplicates are found.
+unittest_flag_check_duplicates=true
 
 ### Global variables which store test case names and manage their
 ### results.
@@ -549,6 +551,51 @@ _unittest_get_description() {
 }
 
 ######################################################################
+# Return True if more than one test cases whose names are the same are
+# found. Otherwise, which means no duplicates found, returns False.
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   True if duplicates are found,
+#   False otherwise.
+######################################################################
+_unittest_find_duplicates() {
+  [[ $unittest_flag_check_duplicates = false ]] && return 0
+
+  declare -i n_dups
+  local func
+  local regex_find_dups="(?:function |readonly |^)\Ktestcase_.*\(\)"
+  local msg
+  local dups_found=false
+
+  while read -r n_dups func; do
+    if (( n_dups > 1 )); then
+      dups_found=true
+      msg="$(__unittest_find_duplicates_make_error_msg "$func" "$n_dups")"
+      echo "$msg" >&2
+    fi
+  done < <(grep -Po "$regex_find_dups" "$unittest_script_filename" | uniq -cd)
+
+  [[ $dups_found=true ]] && return 1
+  return 0
+}
+
+__unittest_find_duplicates_make_error_msg() {
+  local func="$1"
+  local n_dups="$2"
+  local msg
+  local line
+
+  msg="$func is defined $n_dups times in $unittest_script_filename:"$'\n'
+  while read -r line; do
+    msg+="  $line"$'\n'
+  done < <(grep -n "$func" "$unittest_script_filename")
+  echo "$msg"
+}
+
+######################################################################
 # Collects functions whose names begin with `testcase_` and their
 # descriptions provided by the user. Function names and descriptions
 # are stored in global variables `unittest_all_tests` and
@@ -563,6 +610,10 @@ unittest_collect_testcases() {
   local regex_find_testcase="^testcase_.*"
   local funcname
   local description
+
+  if ! _unittest_find_duplicates; then
+    exit 1
+  fi
 
   while IFS= read -r funcname; do
     description="$(_unittest_get_description "$funcname")"

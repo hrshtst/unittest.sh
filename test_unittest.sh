@@ -7,11 +7,21 @@
 # shellcheck source=unittest.sh
 source unittest.sh
 
-### Count the number of test cases defined in this script by finding lines which begins with 'testcase_'. Then subtract one from the count because the function `testcase_double_definition` is defined twice on purpose.
+### Count the number of test cases defined in this script.
+# This is done by finding lines which begins with 'testcase_', then
+# subtracting the number of duplicated functions which have the same
+# name from the count.
 declare -i N_TESTCASES
-N_TESTCASES="$(grep -c "^testcase_.*() {$" "$0")"
-N_TESTCASES=$(( N_TESTCASES - 1 ))
+declare -i N_DUPS
+regex_find_testcase="(?:function |readonly |^)\Ktestcase_.*(?=\(\))"
+N_TESTCASES="$(grep -Pc "$regex_find_testcase" "$0")"
+N_DUPS="$(grep -Po "$regex_find_testcase" "$0" | uniq -cd | wc -l)"
+N_TESTCASES=$(( N_TESTCASES - N_DUPS ))
 readonly N_TESTCASES
+
+
+### Disable checking of duplicated functions to prevent an error.
+unittest_flag_check_duplicates=false
 
 
 ### Testing of methods used in this script privately.
@@ -460,6 +470,47 @@ testcase_collect_testcases_handle_no_description() {
   index="$(_unittest_get_index_by_description "$key")"
 
   [ "${unittest_all_tests[$index]}" = "testcase_no_description" ]
+}
+
+testcase_double_definition() {
+  describe "this is the first definition of testcase_double_definition"
+}
+
+testcase_double_definition() {
+  describe "this is the second definition of testcase_double_definition"
+}
+
+testcase_double_definition2() {
+  describe "this is the first definition of testcase_double_definition2"
+}
+
+function testcase_double_definition2() {
+  describe "this is the second definition of testcase_double_definition2"
+}
+
+testcase_find_duplicates() {
+  describe "_unittest_find_duplicates"\
+           "should return True if more than one duplicates are defined"
+
+  local expected
+  local func
+  local lines=()
+  local line
+
+  expected=""
+  for func in "testcase_double_definition()" "testcase_double_definition2()"; do
+    mapfile -t lines < <(grep -n "$func" "$0")
+    expected+="$func is defined 2 times in $0:"$'\n'
+    for line in "${lines[@]}"; do
+      expected+="  $line"$'\n'
+    done
+  done
+
+  unittest_flag_check_duplicates=true
+  run _unittest_find_duplicates
+  [ "$status" = 1 ]
+  [ "$output"$'\n' = "$expected" ]
+  unittest_flag_check_duplicates=false
 }
 
 testcase_dummy() {
