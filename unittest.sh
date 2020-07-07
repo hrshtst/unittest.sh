@@ -578,7 +578,7 @@ _unittest_find_duplicates() {
     fi
   done < <(grep -Po "$regex_find_dups" "$unittest_script_filename" | uniq -cd)
 
-  [[ $dups_found=true ]] && return 1
+  [[ $dups_found = true ]] && return 1
   return 0
 }
 
