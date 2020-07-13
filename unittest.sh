@@ -1124,9 +1124,34 @@ skip() {
 }
 
 ######################################################################
-# Perform the primary test runner. This carries out the initial setup,
-# the decision of test cases, the execution of them and the printing
-# of the result, sequentially.
+# Performs the primary test runner. This function carries out decision
+# of which test cases to run, execution of them and printing of the
+# results.
+# Globals:
+#   None
+# Arguments:
+#   None
+######################################################################
+unittest_run() {
+  if [[ "$unittest_flag_help" = true ]]; then
+    unittest_help
+    return 0
+  fi
+  unittest_collect_testcases || return 1
+  if [[ "$unittest_flag_list" = true ]]; then
+    unittest_list_tests
+    return 0
+  fi
+  unittest_determine_tests_to_run "${unittest_specified_tests[@]}" || return 1
+  unittest_run_testcases
+  unittest_print_summary
+  return ${#unittest_failed_tests[@]}
+}
+
+######################################################################
+# This is the main function which is placed at the end of the script.
+# This initializes the variables, parses the command arguments and
+# runs the primary test runner.
 # Globals:
 #   None
 # Arguments:
@@ -1135,16 +1160,6 @@ skip() {
 unittest_main() {
   unittest_initialize
   unittest_parse "$@"
-  if [[ "$unittest_flag_help" = true ]]; then
-    unittest_help
-    return 0
-  elif [[ "$unittest_flag_list" = true ]]; then
-    unittest_collect_testcases
-    unittest_list_tests
-    return 0
-  fi
-  unittest_collect_testcases
-  unittest_determine_tests_to_run "${unittest_specified_tests[@]}" || return 1
-  unittest_run_testcases
-  unittest_print_summary
+  unittest_run
+  exit $?
 }
