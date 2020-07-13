@@ -1015,7 +1015,7 @@ unittest_decide_testcases() {
 unittest_run_testcases() {
   local testcase
 
-  for testcase in "${unittest_all_tests[@]}"; do
+  for testcase in "${unittest_tests_to_run[@]}"; do
     _unittest_preprocesses "$testcase"
     setup
     $unittest_testcase
