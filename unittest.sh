@@ -611,9 +611,7 @@ unittest_collect_testcases() {
   local funcname
   local description
 
-  if ! _unittest_find_duplicates; then
-    exit 1
-  fi
+  _unittest_find_duplicates || return 1
 
   while IFS= read -r funcname; do
     description="$(_unittest_get_description "$funcname")"
