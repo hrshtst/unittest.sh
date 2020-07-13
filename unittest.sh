@@ -1001,17 +1001,6 @@ _unittest_print_result() {
 
 ### Core functions
 
-######################################################################
-# Decide which testcases should be run.
-# Globals:
-#   None
-# Arguments:
-#   None
-######################################################################
-unittest_decide_testcases() {
-  unittest_collect_testcases
-}
-
 unittest_run_testcases() {
   local testcase
 
@@ -1154,7 +1143,8 @@ unittest_main() {
     unittest_list_tests
     return 0
   fi
-  unittest_decide_testcases
+  unittest_collect_testcases
+  unittest_determine_tests_to_run "${unittest_specified_tests[@]}" || return 1
   unittest_run_testcases
   unittest_print_summary
 }
