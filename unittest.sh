@@ -727,7 +727,9 @@ _unittest_add_description_to_tests_to_run() {
 }
 
 ######################################################################
-# Determine which test cases will be run.
+# Determine which test cases will be run. Note that this function
+# clears the contents of the variable `unittest_tests_-to_run` at
+# first.
 #
 # Globals:
 #   unittest_tests_to_run
@@ -741,6 +743,7 @@ unittest_determine_tests_to_run() {
   local regex_is_index="^[0-9]+"
   local regex_is_testcase="^testcase_.*"
 
+  unittest_tests_to_run=()
   for testspec in "$@"; do
     if [[ "$testspec" =~ $regex_is_index ]]; then
       _unittest_add_index_to_tests_to_run "$testspec" || return 1
