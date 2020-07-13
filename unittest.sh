@@ -1030,16 +1030,16 @@ unittest_print_summary() {
   local summary
 
   # store numbers of executed tests in variables
-  n_tests=${#unittest_all_tests[@]}
+  n_tests=${#unittest_tests_to_run[@]}
   n_failed=${#unittest_failed_tests[@]}
   n_skipped=${#unittest_skipped_tests[@]}
 
   # make summary text
   summary=""
-  summary+="$(printf "%d %s" $n_tests "$(pluralize test $n_tests)")"
-  summary+="$(printf ", %d %s" $n_failed "$(pluralize failure $n_failed)")"
+  summary+="$(printf "%d %s" "$n_tests" "$(pluralize test "$n_tests")")"
+  summary+="$(printf ", %d %s" "$n_failed" "$(pluralize failure "$n_failed")")"
   if (( n_skipped > 0 )); then
-    summary+="$(printf ", %d skipped" $n_skipped)"
+    summary+="$(printf ", %d skipped" "$n_skipped")"
   fi
 
   # output
