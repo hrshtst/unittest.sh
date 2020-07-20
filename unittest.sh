@@ -714,17 +714,19 @@ _unittest_add_description_to_tests_to_run() {
   local i
   local description
   local funcname
+  local found=false
 
   pattern="$1"
+  # TODO: Take care about computation time.
   for i in "${!unittest_all_descriptions[@]}"; do
     description="${unittest_all_descriptions[i]}"
-    # if [[ "$description" =~ $pattern ]]; then
-    if [[ "$description" = "$pattern" ]]; then
+    if [[ "$description" =~ ^$pattern$ ]]; then
       funcname="${unittest_all_tests[i]}"
       unittest_tests_to_run+=("$funcname")
-      return 0
+      found=true
     fi
   done
+  [[ $found = true ]] && return 0
   error "No tests found with description: '$pattern'" true 2
   return 1
 }
