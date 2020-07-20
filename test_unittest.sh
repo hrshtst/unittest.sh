@@ -665,6 +665,19 @@ testcase_determine_tests_to_run_provide_wildcard_in_funcname() {
   [ "${unittest_tests_to_run[1]}" = "testcase_i_love_music" ]
   [ "${unittest_tests_to_run[2]}" = "testcase_i_love_new_york" ]
 }
+
+testcase_determine_tests_to_run_provide_wildcard_in_funcname2() {
+  describe "unittest_determine_tests_to_run"\
+           "should accept a wildcard in function name, another case"
+
+  unittest_determine_tests_to_run "testcase_no_.*_no_life*"
+
+  [ "${#unittest_tests_to_run[@]}" = 3 ]
+  [ "${unittest_tests_to_run[0]}" = "testcase_no_footy_no_life" ]
+  [ "${unittest_tests_to_run[1]}" = "testcase_no_game_no_life" ]
+  [ "${unittest_tests_to_run[2]}" = "testcase_no_music_no_life" ]
+}
+
 testcase_setup() {
   describe "unittest_setup"\
            "should reset variables to their defaults"
