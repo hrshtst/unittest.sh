@@ -1001,16 +1001,22 @@ _unittest_print_result() {
 
 ### Core functions
 
+_unittest_run_a_testcase() {
+  local testcase="$1"
+
+  _unittest_preprocesses "$testcase"
+  setup
+  $unittest_testcase
+  teardown
+  _unittest_postprocesses "$testcase"
+  _unittest_print_result
+}
+
 unittest_run_testcases() {
   local testcase
 
   for testcase in "${unittest_tests_to_run[@]}"; do
-    _unittest_preprocesses "$testcase"
-    setup
-    $unittest_testcase
-    teardown
-    _unittest_postprocesses "$testcase"
-    _unittest_print_result
+    _unittest_run_a_testcase "$testcase"
   done
 }
 
