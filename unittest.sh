@@ -683,17 +683,20 @@ _unittest_add_index_to_tests_to_run() {
 #   Function name, a string
 ######################################################################
 _unittest_add_funcname_to_tests_to_run() {
-  local funcname
   local testcase
+  local pattern
+  local found=false
 
-  funcname="$1"
+  pattern="$1"
+  # TODO: Take care about computation time.
   for testcase in "${unittest_all_tests[@]}"; do
-    if [[ "$testcase" = "$funcname" ]]; then
-      unittest_tests_to_run+=("$funcname")
-      return 0
+    if [[ "$testcase" =~ ^$pattern$ ]]; then
+      unittest_tests_to_run+=("$testcase")
+      found=true
     fi
   done
-  error "Function $funcname is not defined in $unittest_script_filename" true 2
+  [[ $found = true ]] && return 0
+  error "Function $pattern is not defined in $unittest_script_filename" true 2
   return 1
 }
 

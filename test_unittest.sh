@@ -630,6 +630,41 @@ testcase_determine_tests_to_run_nonexistent_description() {
   [ "$status" = 1 ]
 }
 
+testcase_i_love_new_york() {
+  describe "I love New York"
+}
+
+testcase_i_love_coffee() {
+  describe "I love coffee"
+}
+
+testcase_i_love_music() {
+  describe "I love music"
+}
+
+testcase_no_music_no_life() {
+  describe "No Music. No Life."
+}
+
+testcase_no_game_no_life() {
+  describe "No Game No Life"
+}
+
+testcase_no_footy_no_life() {
+  describe "No footy, no life."
+}
+
+testcase_determine_tests_to_run_provide_wildcard_in_funcname() {
+  describe "unittest_determine_tests_to_run"\
+           "should accept a wildcard in function name"
+
+  unittest_determine_tests_to_run "testcase_i_love.*"
+
+  [ "${#unittest_tests_to_run[@]}" = 3 ]
+  [ "${unittest_tests_to_run[0]}" = "testcase_i_love_coffee" ]
+  [ "${unittest_tests_to_run[1]}" = "testcase_i_love_music" ]
+  [ "${unittest_tests_to_run[2]}" = "testcase_i_love_new_york" ]
+}
 testcase_setup() {
   describe "unittest_setup"\
            "should reset variables to their defaults"
