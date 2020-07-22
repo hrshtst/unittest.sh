@@ -286,6 +286,12 @@ testcase_errtrap() {
   unittest_failed=false
 }
 
+# testcase_assert_fail() {
+#   describe "assert fail"
+
+#   return $ASSERT_FAIL
+# }
+
 testcase_initialize() {
   describe "unittest_initialize"\
            "should initialize variables used throughout running tests"

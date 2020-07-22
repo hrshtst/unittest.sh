@@ -110,6 +110,7 @@ trap unittest_errtrap ERR
 ### Global variables used throughout running the test script.
 
 # Contains a filename of the test script.
+readonly unittest_this_filename="${BASH_SOURCE[0]}"
 readonly unittest_script_filename="${BASH_SOURCE[1]}"
 
 # Contains the working directory to run the script. Its default value
@@ -221,6 +222,10 @@ output=
 export lines
 lines=()
 
+
+### Constant value for assert fail.
+readonly ASSERT_FAIL=99
+readonly unittest_lineno_run_testcase="$(grep -n "^  \$unittest_testcase$" "$unittest_this_filename" | cut -d':' -f1)"
 
 ### Utility functions
 
@@ -383,6 +388,16 @@ unittest_errtrap() {
     unittest_err_source+=("${BASH_SOURCE[1]}")
     unittest_err_lineno+=("${BASH_LINENO[0]}")
     unittest_err_status+=("$_status")
+  elif [[ "${BASH_SOURCE[0]}" = "$unittest_this_filename" &&\
+          "${BASH_LINENO[0]}" = "$unittest_lineno_run_testcase" &&\
+          "$_status" = "$ASSERT_FAIL" ]]; then
+    local _lineno
+    _lineno="$(grep -n "${unittest_testcase}()" "$unittest_script_filename" | cut -d':' -f1)"
+
+    unittest_failed=true
+    unittest_err_source+=("$unittest_script_filename")
+    unittest_err_lineno+=("$_lineno")
+    unittest_err_status+=("ASSERT_FAIL")
   fi
 }
 
