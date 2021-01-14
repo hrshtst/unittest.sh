@@ -261,7 +261,7 @@ error() {
 
 ######################################################################
 # Print a colored line in the terminal.
-# Globasl:
+# Globals:
 #   None
 # Arguments:
 #   Color code, an integar between 0-255.
